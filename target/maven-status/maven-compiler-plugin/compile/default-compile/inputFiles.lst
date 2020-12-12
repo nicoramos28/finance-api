@@ -5,6 +5,7 @@
 /Users/nicolasramos/Documents/GitHub/finance-api/src/main/java/com/laddeep/financeapi/controller/api/StockPriceController.java
 /Users/nicolasramos/Documents/GitHub/finance-api/src/main/java/com/laddeep/financeapi/integrations/finnhub/FinnhubClient.java
 /Users/nicolasramos/Documents/GitHub/finance-api/src/main/java/com/laddeep/financeapi/api/stockPrice/QuoteDto.java
+/Users/nicolasramos/Documents/GitHub/finance-api/src/main/java/com/laddeep/financeapi/integrations/telegram/TelegramClient.java
 /Users/nicolasramos/Documents/GitHub/finance-api/src/main/java/com/laddeep/financeapi/FinanceApiApplication.java
 /Users/nicolasramos/Documents/GitHub/finance-api/src/main/java/com/laddeep/financeapi/controller/api/HelloWorldController.java
 /Users/nicolasramos/Documents/GitHub/finance-api/src/main/java/com/laddeep/financeapi/api/stockPrice/QuoteDtoMapper.java

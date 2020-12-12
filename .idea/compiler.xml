@@ -9,8 +9,8 @@
         <module name="finance-api" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
-      <module name="finance-api" target="1.8" />
+    <bytecodeTargetLevel target="11">
+      <module name="finance-api" target="11" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
