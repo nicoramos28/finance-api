@@ -14,9 +14,9 @@ import java.io.IOException;
 @RestController
 public class StockPriceController {
 
-    StockPriceService stockPriceService;
+    private StockPriceService stockPriceService;
 
-    TelegramMessageService telegramService;
+    private TelegramMessageService telegramService;
 
     public StockPriceController(
         StockPriceService stockPriceService,

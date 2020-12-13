@@ -2,6 +2,7 @@ package com.laddeep.financeapi.integrations.finnhub;
 
 import com.laddeep.financeapi.integrations.finnhub.api.StockPriceQuote;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -13,11 +14,14 @@ import org.springframework.web.client.RestTemplate;
 @Component
 public class FinnhubClient {
 
-    private static final String URL = "https://finnhub.io";
+    @Value("${finnhub.url}")
+    private String URL;
 
-    private static final String BASE_URL = "/api/v1";
+    @Value("${finnhub.base.url}")
+    private String BASE_URL;
 
-    private static final String TOKEN = "bv9dp1n48v6ujthqrjog";
+    @Value("${finnhub.token}")
+    private String TOKEN;
 
     public RestTemplate restTemplate;
 

@@ -19,7 +19,6 @@ public class TelegramMessageService {
         this.telegramClient = telegramClient;
     }
 
-
     public void notifyStockPriceQuote(String quote, QuoteDto quoteData) throws IOException, InterruptedException {
         String message = quote + " prices :\n"
                 + "----- Open price : " + quoteData.getOpenPrice() + "\n"

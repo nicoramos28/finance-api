@@ -2,6 +2,7 @@ package com.laddeep.financeapi.integrations.telegram;
 
 import com.laddeep.financeapi.integrations.RestClient;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.net.http.HttpRequest;
@@ -14,9 +15,8 @@ public class TelegramClient extends RestClient {
 
     private static final String TOKEN = "1437601071:AAE8uLB1iZWALa0VrhrIPgQpMnPOrUSVq5I";
 
-    private static final String CHAT_ID = "982352100";
-
-    private static final String USERNAME = "financeApiBot";
+    @Value("${fabot.chat.id}")
+    private String CHAT_ID;
 
     private static final String uri = "https://api.telegram.org";
 
