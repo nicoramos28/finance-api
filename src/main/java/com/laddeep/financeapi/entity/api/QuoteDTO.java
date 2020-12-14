@@ -1,27 +1,19 @@
-package com.laddeep.financeapi.entity.db;
+package com.laddeep.financeapi.entity.api;
 
-import javax.persistence.*;
+import lombok.Data;
+import java.sql.Timestamp;
 import java.time.OffsetDateTime;
 
-@Entity
-@Table(name = "quote", catalog = "finance_api")
-public class Quote {
+@Data
+public class QuoteDTO {
 
-    @Id
-    @Column(name = "id", nullable = false)
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "quote")
     private String quote;
 
-    @Column(name = "last_update")
     private OffsetDateTime lastUpdate;
 
-    public Quote() {
-    }
-
-    public Quote(Long id, String quote, OffsetDateTime lastUpdate) {
+    public QuoteDTO(Long id, String quote, OffsetDateTime lastUpdate) {
         this.id = id;
         this.quote = quote;
         this.lastUpdate = lastUpdate;
@@ -53,7 +45,7 @@ public class Quote {
 
     @Override
     public String toString() {
-        return "Quote{" +
+        return "QuoteDTO{" +
                 "id=" + id +
                 ", quote='" + quote + '\'' +
                 ", lastUpdate=" + lastUpdate +

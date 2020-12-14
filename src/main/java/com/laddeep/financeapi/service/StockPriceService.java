@@ -1,7 +1,8 @@
 package com.laddeep.financeapi.service;
 
-import com.laddeep.financeapi.api.stockPrice.QuoteDto;
-import com.laddeep.financeapi.api.stockPrice.QuoteDtoMapper;
+import com.laddeep.financeapi.api.stockPrice.StockPriceDTO;
+import com.laddeep.financeapi.entity.db.Quote;
+import com.laddeep.financeapi.mapper.StockPriceDTOMapper;
 import com.laddeep.financeapi.integrations.finnhub.FinnhubClient;
 import com.laddeep.financeapi.integrations.finnhub.api.StockPriceQuote;
 import org.springframework.stereotype.Component;
@@ -9,21 +10,20 @@ import org.springframework.stereotype.Component;
 @Component
 public class StockPriceService {
 
-    private QuoteDtoMapper quoteMapper;
+    private StockPriceDTOMapper stockPriceMapper;
 
     private FinnhubClient finnhubClient;
 
     public StockPriceService(
-        QuoteDtoMapper quoteDtoMapper,
-        FinnhubClient finnhubClient
-    ){
-        this.quoteMapper = quoteDtoMapper;
+            StockPriceDTOMapper quoteDtoMapper,
+            FinnhubClient finnhubClient
+    ) {
+        this.stockPriceMapper = quoteDtoMapper;
         this.finnhubClient = finnhubClient;
     }
 
-
-    public QuoteDto GetStockPriceQuote(String quote){
-        StockPriceQuote response = this.finnhubClient.getStockPriceQuote(quote);
-        return quoteMapper.QuouteDtoMapper(response);
+    public StockPriceDTO GetStockPriceQuote(Quote quote){
+        StockPriceQuote response = this.finnhubClient.getStockPriceQuote(quote.getQuote());
+        return stockPriceMapper.map(response);
     }
 }

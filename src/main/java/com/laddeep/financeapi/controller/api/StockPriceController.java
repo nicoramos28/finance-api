@@ -1,6 +1,8 @@
 package com.laddeep.financeapi.controller.api;
 
-import com.laddeep.financeapi.api.stockPrice.QuoteDto;
+import com.laddeep.financeapi.api.stockPrice.StockPriceDTO;
+import com.laddeep.financeapi.component.QuoteBean;
+import com.laddeep.financeapi.entity.db.Quote;
 import com.laddeep.financeapi.service.StockPriceService;
 import com.laddeep.financeapi.service.TelegramMessageService;
 import lombok.extern.slf4j.Slf4j;
@@ -18,17 +20,22 @@ public class StockPriceController {
 
     private TelegramMessageService telegramService;
 
+    private QuoteBean quoteBean;
+
     public StockPriceController(
         StockPriceService stockPriceService,
-        TelegramMessageService telegramService
+        TelegramMessageService telegramService,
+        QuoteBean quoteBean
     ){
         this.stockPriceService = stockPriceService;
         this.telegramService = telegramService;
+        this.quoteBean = quoteBean;
     }
 
     @RequestMapping("/stock_price/quote{quote}")
-    public QuoteDto retrieveStockPriceQuote(@PathVariable String quote){
-        QuoteDto response = stockPriceService.GetStockPriceQuote(quote);
+    public StockPriceDTO retrieveStockPriceQuote(@PathVariable String quote){
+        Quote ticker = quoteBean.get(quote);
+        StockPriceDTO response = stockPriceService.GetStockPriceQuote(ticker);
         try {
             telegramService.notifyStockPriceQuote(quote, response);
         } catch (IOException e) {

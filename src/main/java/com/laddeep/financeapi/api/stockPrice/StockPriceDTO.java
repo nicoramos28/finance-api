@@ -3,7 +3,7 @@ package com.laddeep.financeapi.api.stockPrice;
 import lombok.Data;
 
 @Data
-public class QuoteDto {
+public class StockPriceDTO {
 
     private String closePrice;
 
@@ -17,9 +17,9 @@ public class QuoteDto {
 
     private String time;
 
-    public QuoteDto(){}
+    public StockPriceDTO(){}
 
-    public QuoteDto(String closePrice, String highestPrice, String lowestPrice, String openPrice, String previousClosePrice, String time) {
+    public StockPriceDTO(String closePrice, String highestPrice, String lowestPrice, String openPrice, String previousClosePrice, String time) {
         this.closePrice = closePrice;
         this.highestPrice = highestPrice;
         this.lowestPrice = lowestPrice;
@@ -78,7 +78,7 @@ public class QuoteDto {
 
     @Override
     public String toString() {
-        return "QuoteDto{" +
+        return "StockPriceDTO{" +
                 "closePrice='" + closePrice + '\'' +
                 ", highestPrice='" + highestPrice + '\'' +
                 ", lowestPrice='" + lowestPrice + '\'' +

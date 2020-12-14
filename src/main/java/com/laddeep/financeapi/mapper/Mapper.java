@@ -1,12 +1,12 @@
 package com.laddeep.financeapi.mapper;
 
-//import org.springframework.data.domain.Page;
-//import org.springframework.data.domain.PageImpl;
-//import java.util.List;
-//import java.util.stream.Collectors;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public abstract class Mapper<DB, API> {
-/*
+
     public abstract API map(DB db);
 
     public List<API> map(List<DB> entities){
@@ -21,5 +21,4 @@ public abstract class Mapper<DB, API> {
         );
     }
 
- */
 }

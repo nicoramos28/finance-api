@@ -1,13 +1,15 @@
-package com.laddeep.financeapi.api.stockPrice;
+package com.laddeep.financeapi.mapper;
 
+import com.laddeep.financeapi.api.stockPrice.StockPriceDTO;
 import com.laddeep.financeapi.integrations.finnhub.api.StockPriceQuote;
 import org.springframework.stereotype.Component;
 
 @Component
-public class QuoteDtoMapper {
+public class StockPriceDTOMapper extends Mapper<StockPriceQuote, StockPriceDTO>{
 
-    public QuoteDto QuouteDtoMapper(StockPriceQuote apiResponse){
-        return new QuoteDto(
+    @Override
+    public StockPriceDTO map(StockPriceQuote apiResponse){
+        return new StockPriceDTO(
                 apiResponse.getC(),
                 apiResponse.getH(),
                 apiResponse.getL(),
@@ -16,4 +18,5 @@ public class QuoteDtoMapper {
                 apiResponse.getT()
         );
     }
+
 }
