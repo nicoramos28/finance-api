@@ -21,10 +21,10 @@ public class TelegramMessageService {
 
     public void notifyStockPriceQuote(String quote, StockPriceDTO quoteData) throws IOException, InterruptedException {
         String message = quote + " prices :\n"
+                + "----- Current price : " + quoteData.getCurrentPrice() + "\n"
                 + "----- Open price : " + quoteData.getOpenPrice() + "\n"
                 + "----- Highest price : " + quoteData.getHighestPrice() + "\n"
                 + "----- Lowest price : " + quoteData.getLowestPrice() + "\n"
-                + "----- Close price : " + quoteData.getClosePrice() + "\n"
                 + "----- Previous close price : " + quoteData.getPreviousClosePrice() + "";
         telegramClient.sendMessage(message);
     }

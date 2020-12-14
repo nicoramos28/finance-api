@@ -11,7 +11,7 @@ public class QuoteBean {
     private QuoteRepository quoteRepository;
 
     private ValidationBean validationBean;
-    
+
     public QuoteBean(QuoteRepository quoteRepository, ValidationBean validationBean) {
         this.quoteRepository = quoteRepository;
         this.validationBean = validationBean;

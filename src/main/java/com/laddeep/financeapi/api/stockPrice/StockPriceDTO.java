@@ -5,7 +5,7 @@ import lombok.Data;
 @Data
 public class StockPriceDTO {
 
-    private String closePrice;
+    private String currentPrice;
 
     private String highestPrice;
 
@@ -19,8 +19,8 @@ public class StockPriceDTO {
 
     public StockPriceDTO(){}
 
-    public StockPriceDTO(String closePrice, String highestPrice, String lowestPrice, String openPrice, String previousClosePrice, String time) {
-        this.closePrice = closePrice;
+    public StockPriceDTO(String currentPrice, String highestPrice, String lowestPrice, String openPrice, String previousClosePrice, String time) {
+        this.currentPrice = currentPrice;
         this.highestPrice = highestPrice;
         this.lowestPrice = lowestPrice;
         this.openPrice = openPrice;
@@ -28,12 +28,12 @@ public class StockPriceDTO {
         this.time = time;
     }
 
-    public String getClosePrice() {
-        return closePrice;
+    public String getCurrentPrice() {
+        return currentPrice;
     }
 
-    public void setClosePrice(String closePrice) {
-        this.closePrice = closePrice;
+    public void setCurrentPrice(String currentPrice) {
+        this.currentPrice = currentPrice;
     }
 
     public String getHighestPrice() {
@@ -79,7 +79,7 @@ public class StockPriceDTO {
     @Override
     public String toString() {
         return "StockPriceDTO{" +
-                "closePrice='" + closePrice + '\'' +
+                "closePrice='" + currentPrice + '\'' +
                 ", highestPrice='" + highestPrice + '\'' +
                 ", lowestPrice='" + lowestPrice + '\'' +
                 ", openPrice='" + openPrice + '\'' +
