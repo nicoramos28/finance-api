@@ -3,31 +3,34 @@ package com.laddeep.financeapi.integrations.finnhub.api;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 
+import java.math.BigDecimal;
+import java.time.OffsetDateTime;
+
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class StockPriceQuote {
 
-    private String c;
+    private BigDecimal c;
 
-    private String h;
+    private BigDecimal h;
 
-    private String l;
+    private BigDecimal l;
 
-    private String o;
+    private BigDecimal o;
 
-    private String pc;
+    private BigDecimal pc;
 
-    private String t;
+    private OffsetDateTime t;
 
     public StockPriceQuote(){}
 
     public StockPriceQuote(
-            String c,
-            String h,
-            String l,
-            String o,
-            String pc,
-            String t) {
+            BigDecimal c,
+            BigDecimal h,
+            BigDecimal l,
+            BigDecimal o,
+            BigDecimal pc,
+            OffsetDateTime t) {
         this.c = c;
         this.h = h;
         this.l = l;
@@ -36,51 +39,51 @@ public class StockPriceQuote {
         this.t = t;
     }
 
-    public String getC() {
+    public BigDecimal getC() {
         return c;
     }
 
-    public void setC(String c) {
+    public void setC(BigDecimal c) {
         this.c = c;
     }
 
-    public String getH() {
+    public BigDecimal getH() {
         return h;
     }
 
-    public void setH(String h) {
+    public void setH(BigDecimal h) {
         this.h = h;
     }
 
-    public String getL() {
+    public BigDecimal getL() {
         return l;
     }
 
-    public void setL(String l) {
+    public void setL(BigDecimal l) {
         this.l = l;
     }
 
-    public String getO() {
+    public BigDecimal getO() {
         return o;
     }
 
-    public void setO(String o) {
+    public void setO(BigDecimal o) {
         this.o = o;
     }
 
-    public String getPc() {
+    public BigDecimal getPc() {
         return pc;
     }
 
-    public void setPc(String pc) {
+    public void setPc(BigDecimal pc) {
         this.pc = pc;
     }
 
-    public String getT() {
+    public OffsetDateTime getT() {
         return t;
     }
 
-    public void setT(String t) {
+    public void setT(OffsetDateTime t) {
         this.t = t;
     }
 

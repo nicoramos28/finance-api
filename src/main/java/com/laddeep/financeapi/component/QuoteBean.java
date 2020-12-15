@@ -28,5 +28,4 @@ public class QuoteBean {
         quoteRepository.save(quote);
         return quote;
     }
-
 }

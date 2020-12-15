@@ -1,19 +1,29 @@
-package com.laddeep.financeapi.entity.api;
+package com.laddeep.financeapi.entity.db;
 
-import lombok.Data;
+import javax.persistence.*;
 import java.time.OffsetDateTime;
 
-@Data
-public class QuoteDTO {
+@Entity
+@Table(name = "stock_following", catalog = "finance_api")
+public class StockFollowing {
 
+    @Id
+    @Column(name = "id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "id_quote")
+    private Long quoteId;
+
+    @Column(name = "quote")
     private String quote;
 
+    @Column(name = "last_update")
     private OffsetDateTime lastUpdate;
 
-    public QuoteDTO(Long id, String quote, OffsetDateTime lastUpdate) {
+    public StockFollowing(Long id, Long quoteId, String quote, OffsetDateTime lastUpdate) {
         this.id = id;
+        this.quoteId = quoteId;
         this.quote = quote;
         this.lastUpdate = lastUpdate;
     }
@@ -26,6 +36,14 @@ public class QuoteDTO {
         this.id = id;
     }
 
+    public Long getQuoteId() {
+        return quoteId;
+    }
+
+    public void setQuoteId(Long quoteId) {
+        this.quoteId = quoteId;
+    }
+
     public String getQuote() {
         return quote;
     }
@@ -33,6 +51,8 @@ public class QuoteDTO {
     public void setQuote(String quote) {
         this.quote = quote;
     }
+
+
 
     public OffsetDateTime getLastUpdate() {
         return lastUpdate;
@@ -44,8 +64,9 @@ public class QuoteDTO {
 
     @Override
     public String toString() {
-        return "QuoteDTO{" +
+        return "StockFollowing{" +
                 "id=" + id +
+                ", quoteId=" + quoteId +
                 ", quote='" + quote + '\'' +
                 ", lastUpdate=" + lastUpdate +
                 '}';

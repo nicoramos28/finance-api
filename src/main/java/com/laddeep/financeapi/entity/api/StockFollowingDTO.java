@@ -4,16 +4,19 @@ import lombok.Data;
 import java.time.OffsetDateTime;
 
 @Data
-public class QuoteDTO {
+public class StockFollowingDTO {
 
     private Long id;
+
+    private Long quoteId;
 
     private String quote;
 
     private OffsetDateTime lastUpdate;
 
-    public QuoteDTO(Long id, String quote, OffsetDateTime lastUpdate) {
+    public StockFollowingDTO(Long id, Long quoteId, String quote, OffsetDateTime lastUpdate) {
         this.id = id;
+        this.quoteId = quoteId;
         this.quote = quote;
         this.lastUpdate = lastUpdate;
     }
@@ -24,6 +27,14 @@ public class QuoteDTO {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public Long getQuoteId() {
+        return quoteId;
+    }
+
+    public void setQuoteId(Long quoteId) {
+        this.quoteId = quoteId;
     }
 
     public String getQuote() {
@@ -44,8 +55,9 @@ public class QuoteDTO {
 
     @Override
     public String toString() {
-        return "QuoteDTO{" +
+        return "StockFollowingDTO{" +
                 "id=" + id +
+                ", quoteId=" + quoteId +
                 ", quote='" + quote + '\'' +
                 ", lastUpdate=" + lastUpdate +
                 '}';
