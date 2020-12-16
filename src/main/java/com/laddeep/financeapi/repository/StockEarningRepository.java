@@ -8,7 +8,7 @@ import java.time.OffsetDateTime;
 
 public interface StockEarningRepository extends JpaRepository<StockEarning, Long> {
 
-    @Query(value = "SELECT * FROM stock_earning se WHERE se.id_quote = ? and month(se.date) = month(?) and year(se.date) = year(?)",
+    @Query(value = "SELECT * FROM stock_earning se WHERE se.id_quote = ? and date(se.date) = date(?)",
             nativeQuery = true)
-    StockEarning findByQuoteIdAndDate(Long id, OffsetDateTime month, OffsetDateTime year);
+    StockEarning findByQuoteIdAndDate(Long id, OffsetDateTime date);
 }

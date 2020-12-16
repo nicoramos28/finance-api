@@ -87,7 +87,7 @@ public class StockBean {
 
     public void saveEarning(Earning earning, Long stockId){
         validationBean.notNull( "Quote", earning.getSymbol());
-        StockEarning stockEarning = earningRepository.findByQuoteIdAndDate(stockId, OffsetDateTime.now(), OffsetDateTime.now());
+        StockEarning stockEarning = earningRepository.findByQuoteIdAndDate(stockId, OffsetDateTime.now());
         if(stockEarning == null){
             stockEarning = new StockEarning(
                     null,
