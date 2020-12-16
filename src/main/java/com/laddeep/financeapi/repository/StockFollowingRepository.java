@@ -8,7 +8,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface StockFollowingRepository extends JpaRepository<StockFollowing, StockFollowingDTO> {
 
-    //@Query(value = "SELECT * FROM stock_follow sf WHERE sf.quote = ?",
-      //      nativeQuery = true)
     StockFollowing findByQuote(String quote);
 }

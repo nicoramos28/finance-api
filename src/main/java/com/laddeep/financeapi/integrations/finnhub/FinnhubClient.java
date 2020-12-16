@@ -1,5 +1,7 @@
 package com.laddeep.financeapi.integrations.finnhub;
 
+import com.laddeep.financeapi.integrations.finnhub.api.Earning;
+import com.laddeep.financeapi.integrations.finnhub.api.EarningsCalendar;
 import com.laddeep.financeapi.integrations.finnhub.api.StockPriceQuote;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -9,6 +11,9 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
+import java.time.OffsetDateTime;
+import java.time.format.DateTimeFormatter;
+
 
 @Slf4j
 @Component
@@ -29,13 +34,15 @@ public class FinnhubClient {
         this.restTemplate = new RestTemplate();
     }
 
-    public <T, R> ResponseEntity<R> get(String url, Class<R> responseType){
+    public <R> ResponseEntity<R> get(String url, Class<R> responseType){
         HttpHeaders headers = new HttpHeaders();
         headers.set("X-Finnhub-Token", TOKEN);
         HttpEntity<String> entity = new HttpEntity<>("", headers);
         log.info("GET URL Request : {}", url);
         log.info("Headers : {}", headers);
-        return this.restTemplate.exchange(url, HttpMethod.GET, entity, responseType);
+        ResponseEntity<R> response = this.restTemplate.exchange(url, HttpMethod.GET, entity, responseType);
+        log.info("Finnhub api response : {}", response);
+        return response;
     }
 
     /**
@@ -48,6 +55,28 @@ public class FinnhubClient {
         log.info("Finnhub response - {} Stock Price: {}",quote, dto);
         if(dto != null){
             return dto.getBody();
+        }
+        return null;
+    }
+
+    /**
+     * Earnings Calendar
+     * https://finnhub.io/api/v1/calendar/earnings?from=2020-03-12&to=2020-03-15
+     * Arguments
+     *  - from date
+     *  - to date
+     *  - symbol quote
+     *  - international boolean : default is false
+     */
+    public EarningsCalendar getEarnings(OffsetDateTime fromDate, OffsetDateTime toDate){
+        String from = fromDate.format(DateTimeFormatter.ISO_LOCAL_DATE);
+        String to = toDate.format(DateTimeFormatter.ISO_LOCAL_DATE);
+        log.info("Getting earnings from : {} - to : {}", from, to);
+        ResponseEntity<EarningsCalendar> earnings = this.get(URL + BASE_URL
+                        + "/calendar/earnings?from=" + from + "&to=" + to, EarningsCalendar.class);
+
+        if(earnings.getBody() != null){
+            return earnings.getBody();
         }
         return null;
     }

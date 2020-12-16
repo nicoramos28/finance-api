@@ -34,7 +34,18 @@ create table stock_following(
 
 alter table stock_following add CONSTRAINT fk_quote foreign key (id_quote) references quote(id);
 
-
+create table stock_earning (
+    id int(11) not null auto_increment, 
+    id_quote int (11) not null,
+    date datetime not null, 
+    eps_current decimal (18,5) DEFAULT '0.00',
+    eps_estimate decimal (18,5) DEFAULT '0.00',
+    quarter tinyint(1) not null default 0,
+    revenue_actual bigint(15),
+    revenue_estimate bigint(15),
+    primary key (id),
+    foreign key (id_quote) references quote(id)
+);
 
 
 create table stock_split (
@@ -43,8 +54,6 @@ create table stock_split (
 create table stock_trend (
 );
 
-create table stock_earning (
-);
 
 create table stock_eps (
 );

@@ -51,4 +51,5 @@ public class StockPriceController {
         Quote ticker = quoteBean.get(quote);
         return stockService.saveStockToFollow(ticker);
     }
+
 }
