@@ -138,7 +138,7 @@ public class StockBean {
         }
     }
 
-    public void saveSma(Quote quote, BigDecimal ma, int period){
+    public void saveSma(Quote quote, BigDecimal ma, int period, int status){
         validationBean.notNull("Quote", quote.getQuote());
         try{
             StockSma sma = smaRepository.findByQuoteIdAndPeriod(quote.getId(), period);
@@ -148,7 +148,8 @@ public class StockBean {
                         period,
                         quote.getId(),
                         OffsetDateTime.now(),
-                        ma
+                        ma,
+                        status
                 );
                 log.info("Saving new sma value to : {} - date {} - value {}", quote.getQuote(), sma.getDate().format(DateTimeFormatter.ISO_LOCAL_DATE), ma);
             }else{
@@ -160,7 +161,7 @@ public class StockBean {
         }
     }
 
-    public void saveEma(Quote quote, BigDecimal ma, int period){
+    public void saveEma(Quote quote, BigDecimal ma, int period, int status){
         validationBean.notNull("Quote", quote.getQuote());
         try{
             StockEma ema = emaRepository.findByQuoteIdAndPeriod(quote.getId(), period);
@@ -170,7 +171,8 @@ public class StockBean {
                         period,
                         quote.getId(),
                         OffsetDateTime.now(),
-                        ma
+                        ma,
+                        status
                 );
                 log.info("Saving new sma value to : {} - date {} - value {}", quote.getQuote(), ema.getDate().format(DateTimeFormatter.ISO_LOCAL_DATE), ma);
             }else{

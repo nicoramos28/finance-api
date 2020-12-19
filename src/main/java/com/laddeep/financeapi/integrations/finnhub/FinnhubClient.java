@@ -1,6 +1,7 @@
 package com.laddeep.financeapi.integrations.finnhub;
 
 import com.laddeep.financeapi.entity.api.EmaDTO;
+import com.laddeep.financeapi.entity.api.SmaDTO;
 import com.laddeep.financeapi.exceptions.BadRequestException;
 import com.laddeep.financeapi.integrations.finnhub.api.EarningsCalendar;
 import com.laddeep.financeapi.integrations.finnhub.api.StockPriceQuote;
@@ -75,7 +76,7 @@ public class FinnhubClient {
      * https://finnhub.io/api/v1/calendar/earnings?from=2020-03-12&to=2020-03-15
      * @param fromDate
      * @param toDate
-     * @return earningsCalendar
+     * @return
      */
     public EarningsCalendar getEarnings(OffsetDateTime fromDate, OffsetDateTime toDate){
         String from = fromDate.format(DateTimeFormatter.ISO_LOCAL_DATE);
@@ -99,34 +100,51 @@ public class FinnhubClient {
      * https://finnhub.io/api/v1/indicator?symbol=AAPL&resolution=D&from=1583098857&to=1584308457&indicator=sma&timeperiod=3
      * @param quote
      * @param toDate
-     * @param indicator
+     * @param R
      * @param timePeriod
-     * @return stockEma
+     * @param <R>
+     * @return
      */
-    public EmaDTO getMovingAverage(String quote, OffsetDateTime toDate, String indicator, String timePeriod){
+    public <R> R getMovingAverage(String quote, OffsetDateTime toDate, Class R, int timePeriod){
         Long from, to = toDate.toEpochSecond();
         switch (timePeriod){
-            case "7": from = toDate.minus(2, ChronoUnit.MONTHS).toEpochSecond();
+            case 7: from = toDate.minus(2, ChronoUnit.MONTHS).toEpochSecond();
                 break;
-            case "30" : from = toDate.minus(4, ChronoUnit.MONTHS).toEpochSecond();
+            case 30 : from = toDate.minus(4, ChronoUnit.MONTHS).toEpochSecond();
             break;
-            case "200" : from = toDate.minus(2, ChronoUnit.MONTHS).toEpochSecond();
+            case 200 : from = toDate.minus(1, ChronoUnit.YEARS).toEpochSecond();
             break;
             default:
                 throw new BadRequestException("Incorrect time period to EMA");
         }
-        log.info("Getting EMA values");
-        try{
-            ResponseEntity<EmaDTO> emaValues = this.get(
-                    URL + BASE_URL + "/indicator?symbol=" + quote + "&resolution=D"
-                            + "&from=" + from + "&to=" + to + "&indicator=" + indicator + "&timeperiod=" + timePeriod,
-                    EmaDTO.class
-            );
-            if(emaValues.getBody() != null){
-                return emaValues.getBody();
+        if(R == EmaDTO.class){
+            log.info("Getting EMA values");
+            try{
+                ResponseEntity<EmaDTO> emaValues = this.get(
+                        URL + BASE_URL + "/indicator?symbol=" + quote + "&resolution=D"
+                                + "&from=" + from + "&to=" + to + "&indicator=ema&timeperiod=" + timePeriod,
+                        R
+                );
+                if(emaValues.getBody() != null){
+                    return (R) emaValues.getBody();
+                }
+            }catch (BadRequestException e){
+                throw new BadRequestException(e.getMessage());
             }
-        }catch (BadRequestException e){
-            throw new BadRequestException(e.getMessage());
+        }else if(R == SmaDTO.class){
+            log.info("Getting SMA values");
+            try{
+                ResponseEntity<SmaDTO> smaValues = this.get(
+                        URL + BASE_URL + "/indicator?symbol=" + quote + "&resolution=D"
+                                + "&from=" + from + "&to=" + to + "&indicator=sma&timeperiod=" + timePeriod,
+                        R
+                );
+                if(smaValues.getBody() != null){
+                    return (R) smaValues.getBody();
+                }
+            }catch (BadRequestException e){
+                throw new BadRequestException(e.getMessage());
+            }
         }
         return null;
     }

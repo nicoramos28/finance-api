@@ -25,14 +25,18 @@ public class StockEma {
     @Column(name = "value", nullable = false)
     private BigDecimal value;
 
+    @Column(name = "status")
+    private int status;
+
     public StockEma(){}
 
-    public StockEma(Long id, int period, Long quoteId, OffsetDateTime date, BigDecimal value) {
+    public StockEma(Long id, int period, Long quoteId, OffsetDateTime date, BigDecimal value, int status) {
         this.id = id;
         this.period = period;
         this.quoteId = quoteId;
         this.date = date;
         this.value = value;
+        this.status = status;
     }
 
     public Long getId() {
@@ -75,6 +79,14 @@ public class StockEma {
         this.value = value;
     }
 
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
+    }
+
     @Override
     public String toString() {
         return "StockEma{" +
@@ -83,6 +95,7 @@ public class StockEma {
                 ", quoteId=" + quoteId +
                 ", date=" + date +
                 ", value=" + value +
+                ", status=" + status +
                 '}';
     }
 }

@@ -54,6 +54,7 @@ create table stock_technical_ema (
     date datetime not null,
     value decimal (18,5) not null,
     primary key (id),
+    status int(6),
     foreign key (id_quote) references quote(id) 
 );
 
@@ -63,6 +64,7 @@ create table stock_technical_sma (
     id_quote int (11) not null,
     date datetime not null,
     value decimal (18,5) not null,
+    status int(6),
     primary key (id),
     foreign key (id_quote) references quote(id) 
 );

@@ -29,4 +29,8 @@ public class SmaDTO {
                 "sma=" + sma +
                 '}';
     }
+
+    public BigDecimal get(){
+        return sma.get(sma.size()-1);
+    }
 }

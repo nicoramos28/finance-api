@@ -29,7 +29,8 @@ public class FinanceApiApplication {
 	public void financeApiRunner() throws IOException, InterruptedException {
 		log.info("\n######################################## Runner started ########################################");
 		earningService.getDailyEarning();
-		stockService.geStockEmaValues("BEKE", "7");
+		stockService.geStockEmaValues("AAPL", null);
+		stockService.geStockSmaValues("AAPL", null);
 		log.info("\n######################################## Runner finished ########################################\n");
 	}
 }
