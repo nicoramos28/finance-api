@@ -10,11 +10,13 @@ import com.laddeep.financeapi.exceptions.BadRequestException;
 import com.laddeep.financeapi.mapper.StockPriceDTOMapper;
 import com.laddeep.financeapi.integrations.finnhub.FinnhubClient;
 import com.laddeep.financeapi.integrations.finnhub.api.StockPriceQuote;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 
 @Component
+@Slf4j
 public class StockService {
 
     private StockPriceDTOMapper stockPriceMapper;
@@ -55,9 +57,14 @@ public class StockService {
         return stockBean.getFollow(quote);
     }
 
-    public StockEma geStockEmaValues(Quote quote, String timeFrame, String timePeriod){
-        EmaDTO emaValues = this.finnhubClient.getMovingAverage(quote.getQuote(), timeFrame, OffsetDateTime.now(), "ema", timePeriod);
-        return null;
+    public void geStockEmaValues(String ticker, String timePeriod){
+        Quote quote = quoteBean.get(ticker);
+        EmaDTO ema7 = this.finnhubClient.getMovingAverage(quote.getQuote(), OffsetDateTime.now(), "ema", "7");
+        EmaDTO ema30 = this.finnhubClient.getMovingAverage(quote.getQuote(), OffsetDateTime.now(), "ema", "30");
+        log.info("EMA 7 value : {}", ema7.get());
+        stockBean.saveEma(quote, ema7.get(), 7);
+        log.info("EMA 30 value : {}", ema30.get());
+        stockBean.saveEma(quote, ema30.get(), 30);
     }
 
 }

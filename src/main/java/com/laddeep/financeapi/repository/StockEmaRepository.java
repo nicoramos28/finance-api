@@ -4,4 +4,6 @@ import com.laddeep.financeapi.entity.db.StockEma;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface StockEmaRepository extends JpaRepository<StockEma, Long> {
+
+    StockEma findByQuoteIdAndPeriod(Long quoteId, int period);
 }

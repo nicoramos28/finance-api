@@ -1,15 +1,10 @@
 package com.laddeep.financeapi.component;
 
-import com.laddeep.financeapi.entity.db.Quote;
-import com.laddeep.financeapi.entity.db.StockEarning;
-import com.laddeep.financeapi.entity.db.StockFollowing;
-import com.laddeep.financeapi.entity.db.StockPrice;
+import com.laddeep.financeapi.entity.db.*;
 import com.laddeep.financeapi.exceptions.PersistenceException;
 import com.laddeep.financeapi.integrations.finnhub.api.Earning;
 import com.laddeep.financeapi.integrations.finnhub.api.StockPriceQuote;
-import com.laddeep.financeapi.repository.StockEarningRepository;
-import com.laddeep.financeapi.repository.StockFollowingRepository;
-import com.laddeep.financeapi.repository.StockPriceRepository;
+import com.laddeep.financeapi.repository.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import java.math.BigDecimal;
@@ -28,16 +23,24 @@ public class StockBean {
 
     private StockEarningRepository earningRepository;
 
+    private StockEmaRepository emaRepository;
+
+    private StockSmaRepository smaRepository;
+
     public StockBean(
             StockPriceRepository stockPriceRepository,
             ValidationBean validationBean,
             StockFollowingRepository stockFollowingRepository,
-            StockEarningRepository earningRepository
+            StockEarningRepository earningRepository,
+            StockEmaRepository emaRepository,
+            StockSmaRepository smaRepository
     ) {
         this.stockPriceRepository = stockPriceRepository;
         this.validationBean = validationBean;
         this.stockFollowingRepository = stockFollowingRepository;
         this.earningRepository = earningRepository;
+        this.emaRepository = emaRepository;
+        this.smaRepository = smaRepository;
     }
 
     public void get(Quote quote, StockPriceQuote stockPrices) {
@@ -72,7 +75,7 @@ public class StockBean {
             }
             stockPriceRepository.save(stock);
         }catch (PersistenceException e){
-            throw new PersistenceException("Error trying to get, update or insert new information");
+            throw new PersistenceException("Error trying to get, update or insert new Stock information");
         }
 
     }
@@ -94,7 +97,7 @@ public class StockBean {
             stockFollowingRepository.save(stock);
             return stock.getId();
         }catch (PersistenceException e){
-            throw new PersistenceException("Error trying to get, update or insert new information");
+            throw new PersistenceException("Error trying to get, update or insert new Follow Stock information");
         }
     }
 
@@ -131,7 +134,51 @@ public class StockBean {
                 stockEarning.setEnabled(1);
             }
         }catch (PersistenceException e){
-            throw new PersistenceException("Error trying to get, update or insert new information");
+            throw new PersistenceException("Error trying to get, update or insert new Earning information");
+        }
+    }
+
+    public void saveSma(Quote quote, BigDecimal ma, int period){
+        validationBean.notNull("Quote", quote.getQuote());
+        try{
+            StockSma sma = smaRepository.findByQuoteIdAndPeriod(quote.getId(), period);
+            if(sma == null){
+                sma = new StockSma(
+                        null,
+                        period,
+                        quote.getId(),
+                        OffsetDateTime.now(),
+                        ma
+                );
+                log.info("Saving new sma value to : {} - date {} - value {}", quote.getQuote(), sma.getDate().format(DateTimeFormatter.ISO_LOCAL_DATE), ma);
+            }else{
+                sma.setValue(ma);
+            }
+            smaRepository.save(sma);
+        }catch (PersistenceException e){
+            throw new PersistenceException("Error trying to get, update or insert new SMA information");
+        }
+    }
+
+    public void saveEma(Quote quote, BigDecimal ma, int period){
+        validationBean.notNull("Quote", quote.getQuote());
+        try{
+            StockEma ema = emaRepository.findByQuoteIdAndPeriod(quote.getId(), period);
+            if(ema == null){
+                ema = new StockEma(
+                        null,
+                        period,
+                        quote.getId(),
+                        OffsetDateTime.now(),
+                        ma
+                );
+                log.info("Saving new sma value to : {} - date {} - value {}", quote.getQuote(), ema.getDate().format(DateTimeFormatter.ISO_LOCAL_DATE), ma);
+            }else{
+                ema.setValue(ma);
+            }
+            emaRepository.save(ema);
+        }catch (PersistenceException e){
+            throw new PersistenceException("Error trying to get, update or insert new SMA information");
         }
     }
 }

@@ -44,7 +44,10 @@ public class FinnhubClient {
         log.info("Headers : {}", headers);
         ResponseEntity<R> response = this.restTemplate.exchange(url, HttpMethod.GET, entity, responseType);
         log.info("Finnhub api response : {}", response);
-        return response;
+        if(response.getBody() != null && response.getStatusCode().is2xxSuccessful()){
+            return response;
+        }
+        return null;
     }
 
     /**
@@ -95,20 +98,28 @@ public class FinnhubClient {
      * Technical Indicators
      * https://finnhub.io/api/v1/indicator?symbol=AAPL&resolution=D&from=1583098857&to=1584308457&indicator=sma&timeperiod=3
      * @param quote
-     * @param resolution
      * @param toDate
      * @param indicator
      * @param timePeriod
      * @return stockEma
      */
-    public EmaDTO getMovingAverage(String quote, String resolution, OffsetDateTime toDate, String indicator, String timePeriod){
-        String from = toDate.minus(2, ChronoUnit.MONTHS).format(DateTimeFormatter.ISO_LOCAL_DATE);
-        String to = toDate.format(DateTimeFormatter.ISO_LOCAL_DATE);
+    public EmaDTO getMovingAverage(String quote, OffsetDateTime toDate, String indicator, String timePeriod){
+        Long from, to = toDate.toEpochSecond();
+        switch (timePeriod){
+            case "7": from = toDate.minus(2, ChronoUnit.MONTHS).toEpochSecond();
+                break;
+            case "30" : from = toDate.minus(4, ChronoUnit.MONTHS).toEpochSecond();
+            break;
+            case "200" : from = toDate.minus(2, ChronoUnit.MONTHS).toEpochSecond();
+            break;
+            default:
+                throw new BadRequestException("Incorrect time period to EMA");
+        }
         log.info("Getting EMA values");
         try{
             ResponseEntity<EmaDTO> emaValues = this.get(
-                    URL + BASE_URL + "/indicator?symbol=" + quote + "&resolution="
-                            + resolution + "&from=" + from + "&to=" + to + "&indicator=" + indicator + "&timeperiod=" + timePeriod,
+                    URL + BASE_URL + "/indicator?symbol=" + quote + "&resolution=D"
+                            + "&from=" + from + "&to=" + to + "&indicator=" + indicator + "&timeperiod=" + timePeriod,
                     EmaDTO.class
             );
             if(emaValues.getBody() != null){

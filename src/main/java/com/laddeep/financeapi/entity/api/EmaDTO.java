@@ -23,6 +23,9 @@ public class EmaDTO {
         this.ema = ema;
     }
 
+    public BigDecimal get(){
+        return ema.get(ema.size()-1);
+    }
     @Override
     public String toString() {
         return "EmaDTO{" +

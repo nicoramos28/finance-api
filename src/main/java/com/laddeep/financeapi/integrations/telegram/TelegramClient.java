@@ -36,12 +36,12 @@ public class TelegramClient {
                 .connectTimeout(Duration.ofSeconds(10))
                 .version(HttpClient.Version.HTTP_2)
                 .build();
-        builder = UriBuilder
-                .fromUri(endpoint)
-                .path(path());
     }
 
     public void sendMessage(String message) throws IOException, InterruptedException {
+        builder = UriBuilder
+                .fromUri(endpoint)
+                .path(path());
         log.info("Message to send : \n{}", message);
         this.builder.queryParam("chat_id",CHAT_ID)
                 .queryParam("text", message);

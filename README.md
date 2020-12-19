@@ -47,7 +47,7 @@ create table stock_earning (
     foreign key (id_quote) references quote(id)
 );
 
-create table stock_tecnhical_ema (
+create table stock_technical_ema (
     id int(11) not null auto_increment,
     period int(11) not null, 
     id_quote int (11) not null,
