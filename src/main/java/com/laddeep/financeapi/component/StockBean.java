@@ -4,6 +4,7 @@ import com.laddeep.financeapi.entity.db.Quote;
 import com.laddeep.financeapi.entity.db.StockEarning;
 import com.laddeep.financeapi.entity.db.StockFollowing;
 import com.laddeep.financeapi.entity.db.StockPrice;
+import com.laddeep.financeapi.exceptions.PersistenceException;
 import com.laddeep.financeapi.integrations.finnhub.api.Earning;
 import com.laddeep.financeapi.integrations.finnhub.api.StockPriceQuote;
 import com.laddeep.financeapi.repository.StockEarningRepository;
@@ -39,72 +40,98 @@ public class StockBean {
         this.earningRepository = earningRepository;
     }
 
-    public void get(Quote quote, StockPriceQuote response) {
-        validationBean.notNull("StockPrices", response);
+    public void get(Quote quote, StockPriceQuote stockPrices) {
+        validationBean.notNull("StockPrices", stockPrices);
         StockPrice stock = stockPriceRepository.findByQuoteIdAndTime(quote.getId(), OffsetDateTime.now());
-        if(stock == null){
-            stock = new StockPrice(
-                    null,
-                    quote.getId(),
-                    response.getC(),
-                    response.getH(),
-                    response.getL(),
-                    response.getO(),
-                    response.getPc(),
-                    OffsetDateTime.now()
-            );
-        }else{
-            if(stock.getCurrentPrice().equals(BigDecimal.ZERO)){
-                stock.setCurrentPrice(response.getC());
-                stock.setHighestPrice(response.getH());
-                stock.setLowestPrice(response.getL());
-                stock.setOpenPrice(response.getO());
-                stock.setPreviousClosePrice(response.getPc());
+        try{
+            if(stock == null){
+                stock = new StockPrice(
+                        null,
+                        quote.getId(),
+                        stockPrices.getC(),
+                        stockPrices.getH(),
+                        stockPrices.getL(),
+                        stockPrices.getO(),
+                        stockPrices.getPc(),
+                        OffsetDateTime.now()
+                );
+                log.info("Saving new Stock Price to {}", quote.getQuote());
+            }else{
+                if(stock.getCurrentPrice().equals(BigDecimal.ZERO)){
+                    stock.setCurrentPrice(stockPrices.getC());
+                    stock.setHighestPrice(stockPrices.getH());
+                    stock.setLowestPrice(stockPrices.getL());
+                    stock.setOpenPrice(stockPrices.getO());
+                    stock.setPreviousClosePrice(stockPrices.getPc());
+                    log.info("Updating Stock Price to {}", quote.getQuote());
+                }
+                stock.setCurrentPrice(stockPrices.getC());
+                stock.setHighestPrice(stockPrices.getH());
+                stock.setLowestPrice(stockPrices.getL());
+                log.info("Updating Stock Price to {}", quote.getQuote());
             }
-            stock.setCurrentPrice(response.getC());
-            stock.setHighestPrice(response.getH());
-            stock.setLowestPrice(response.getL());
+            stockPriceRepository.save(stock);
+        }catch (PersistenceException e){
+            throw new PersistenceException("Error trying to get, update or insert new information");
         }
-        stockPriceRepository.save(stock);
+
     }
 
     public Long getFollow(Quote quote){
         validationBean.notNull("Quote", quote.getQuote());
         StockFollowing stock = stockFollowingRepository.findByQuote(quote.getQuote());
-        if(stock == null){
-            stock = new StockFollowing(
-                    null,
-                    quote.getId(),
-                    quote.getQuote(),
-                    OffsetDateTime.now()
-            );
-        }else{
-            stock.setLastUpdate(OffsetDateTime.now());
+        try{
+            if(stock == null){
+                stock = new StockFollowing(
+                        null,
+                        quote.getId(),
+                        quote.getQuote(),
+                        OffsetDateTime.now()
+                );
+            }else{
+                stock.setLastUpdate(OffsetDateTime.now());
+            }
+            stockFollowingRepository.save(stock);
+            return stock.getId();
+        }catch (PersistenceException e){
+            throw new PersistenceException("Error trying to get, update or insert new information");
         }
-        stockFollowingRepository.save(stock);
-        return stock.getId();
     }
 
-    public void saveEarning(Earning earning, Long stockId){
+    public void saveEarning(Earning earning, Quote stock){
         validationBean.notNull( "Quote", earning.getSymbol());
-        StockEarning stockEarning = earningRepository.findByQuoteIdAndDate(stockId, OffsetDateTime.now());
-        if(stockEarning == null){
-            stockEarning = new StockEarning(
-                    null,
-                    stockId,
-                    OffsetDateTime.now(),
-                    earning.getEpsActual(),
-                    earning.getEpsEstimate(),
-                    earning.getQuarter(),
-                    earning.getRevenueActual(),
-                    earning.getRevenueEstimate()
-            );
-            earningRepository.save(stockEarning);
-            log.info("Saving new earning : {} - date {}", earning.getSymbol(), stockEarning.getDate().format(DateTimeFormatter.ISO_LOCAL_DATE));
-        }else if(stockEarning.getActualRevenue() == 0 && earning.getRevenueActual() != 0){
-            stockEarning.setCurrentEps(earning.getEpsActual());
-            stockEarning.setActualRevenue(earning.getRevenueActual());
-            earningRepository.save(stockEarning);
+        StockEarning stockEarning = earningRepository.findByQuoteId(stock.getId());
+        try{
+            if(stockEarning == null){
+                stockEarning = new StockEarning(
+                        null,
+                        stock.getId(),
+                        OffsetDateTime.now(),
+                        earning.getEpsActual(),
+                        earning.getEpsEstimate(),
+                        earning.getQuarter(),
+                        earning.getRevenueActual(),
+                        earning.getRevenueEstimate(),
+                        1
+                );
+                earningRepository.save(stockEarning);
+                this.getFollow(stock);
+                log.info("Saving new earning : {} - date {}", earning.getSymbol(), stockEarning.getDate().format(DateTimeFormatter.ISO_LOCAL_DATE));
+            }else if(stockEarning.getActualRevenue() == 0 && earning.getRevenueActual() != 0){
+                stockEarning.setCurrentEps(earning.getEpsActual());
+                stockEarning.setActualRevenue(earning.getRevenueActual());
+                stockEarning.setDate(OffsetDateTime.now());
+            }else if(stockEarning.getEnabled() == 0){
+                stockEarning.setDate(OffsetDateTime.now());
+                stockEarning.setCurrentEps(earning.getEpsActual());
+                stockEarning.setEstimateEps(earning.getEpsEstimate());
+                stockEarning.setQuarter(earning.getQuarter());
+                stockEarning.setActualRevenue(earning.getRevenueActual());
+                stockEarning.setEstimateRevenue(earning.getRevenueEstimate());
+                stockEarning.setEnabled(1);
+            }
+        }catch (PersistenceException e){
+            throw new PersistenceException("Error trying to get, update or insert new information");
         }
     }
 }

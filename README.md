@@ -1,5 +1,4 @@
 # finance-api
-
 DB Structure 
 
 create database finance_api;
@@ -43,17 +42,27 @@ create table stock_earning (
     quarter tinyint(1) not null default 0,
     revenue_actual bigint(15),
     revenue_estimate bigint(15),
+    enabled tinyint(1) default 1,
     primary key (id),
     foreign key (id_quote) references quote(id)
 );
 
-
-create table stock_split (
+create table stock_tecnhical_ema (
+    id int(11) not null auto_increment,
+    period int(11) not null, 
+    id_quote int (11) not null,
+    date datetime not null,
+    value decimal (18,5) not null,
+    primary key (id),
+    foreign key (id_quote) references quote(id) 
 );
 
-create table stock_trend (
-);
-
-
-create table stock_eps (
+create table stock_technical_sma (
+    id int(11) not null auto_increment, 
+    period int(11) not null, 
+    id_quote int (11) not null,
+    date datetime not null,
+    value decimal (18,5) not null,
+    primary key (id),
+    foreign key (id_quote) references quote(id) 
 );

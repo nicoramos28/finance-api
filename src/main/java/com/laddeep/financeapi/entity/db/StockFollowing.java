@@ -21,6 +21,8 @@ public class StockFollowing {
     @Column(name = "last_update")
     private OffsetDateTime lastUpdate;
 
+    public StockFollowing(){}
+
     public StockFollowing(Long id, Long quoteId, String quote, OffsetDateTime lastUpdate) {
         this.id = id;
         this.quoteId = quoteId;

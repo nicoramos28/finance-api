@@ -1,6 +1,6 @@
 package com.laddeep.financeapi.controller.api;
 
-import com.laddeep.financeapi.api.stockPrice.StockPriceDTO;
+import com.laddeep.financeapi.entity.api.StockPriceDTO;
 import com.laddeep.financeapi.component.QuoteBean;
 import com.laddeep.financeapi.entity.db.Quote;
 import com.laddeep.financeapi.service.StockService;
@@ -13,7 +13,7 @@ import java.io.IOException;
 
 @Slf4j
 @RestController
-public class StockPriceController {
+public class StockController {
 
     private StockService stockService;
 
@@ -21,7 +21,7 @@ public class StockPriceController {
 
     private QuoteBean quoteBean;
 
-    public StockPriceController(
+    public StockController(
             StockService stockService,
             TelegramMessageService telegramService,
             QuoteBean quoteBean

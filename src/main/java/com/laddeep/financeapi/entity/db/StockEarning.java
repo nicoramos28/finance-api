@@ -33,6 +33,9 @@ public class StockEarning {
     @Column(name = "revenue_estimate")
     private double estimateRevenue;
 
+    @Column(name = "enabled")
+    private int enabled;
+
     public StockEarning(){}
 
     public StockEarning(Long id,
@@ -42,7 +45,8 @@ public class StockEarning {
                         float estimateEps,
                         int quarter,
                         double actualRevenue,
-                        double estimateRevenue) {
+                        double estimateRevenue,
+                        int enabled) {
         this.id = id;
         this.quoteId = quoteId;
         this.date = date;
@@ -51,6 +55,7 @@ public class StockEarning {
         this.quarter = quarter;
         this.actualRevenue = actualRevenue;
         this.estimateRevenue = estimateRevenue;
+        this.enabled = enabled;
     }
 
     public Long getId() {
@@ -129,5 +134,13 @@ public class StockEarning {
                 ", actualRevenue=" + actualRevenue +
                 ", estimateRevenue=" + estimateRevenue +
                 '}';
+    }
+
+    public int getEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(int enabled) {
+        this.enabled = enabled;
     }
 }

@@ -1,6 +1,7 @@
 package com.laddeep.financeapi.integrations.finnhub;
 
-import com.laddeep.financeapi.integrations.finnhub.api.Earning;
+import com.laddeep.financeapi.entity.api.EmaDTO;
+import com.laddeep.financeapi.exceptions.BadRequestException;
 import com.laddeep.financeapi.integrations.finnhub.api.EarningsCalendar;
 import com.laddeep.financeapi.integrations.finnhub.api.StockPriceQuote;
 import lombok.extern.slf4j.Slf4j;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 
 
 @Slf4j
@@ -48,13 +50,19 @@ public class FinnhubClient {
     /**
      * Stock Price Quoute
      * https://finnhub.io/api/v1/quote?symbol=AAPL&token=
+     * @param quote
+     * @return stockPriceQuote
      */
     public StockPriceQuote getStockPriceQuote(String quote){
-        ResponseEntity<StockPriceQuote> dto = this.get(URL + BASE_URL + "/quote?symbol=" + quote,
-                StockPriceQuote.class);
-        log.info("Finnhub response - {} Stock Price: {}",quote, dto);
-        if(dto != null){
-            return dto.getBody();
+        try{
+            ResponseEntity<StockPriceQuote> dto = this.get(URL + BASE_URL + "/quote?symbol=" + quote,
+                    StockPriceQuote.class);
+            log.info("Finnhub response - {} Stock Price: {}",quote, dto);
+            if(dto != null){
+                return dto.getBody();
+            }
+        }catch (BadRequestException e){
+            throw new BadRequestException(e.getMessage());
         }
         return null;
     }
@@ -62,21 +70,52 @@ public class FinnhubClient {
     /**
      * Earnings Calendar
      * https://finnhub.io/api/v1/calendar/earnings?from=2020-03-12&to=2020-03-15
-     * Arguments
-     *  - from date
-     *  - to date
-     *  - symbol quote
-     *  - international boolean : default is false
+     * @param fromDate
+     * @param toDate
+     * @return earningsCalendar
      */
     public EarningsCalendar getEarnings(OffsetDateTime fromDate, OffsetDateTime toDate){
         String from = fromDate.format(DateTimeFormatter.ISO_LOCAL_DATE);
         String to = toDate.format(DateTimeFormatter.ISO_LOCAL_DATE);
         log.info("Getting earnings from : {} - to : {}", from, to);
-        ResponseEntity<EarningsCalendar> earnings = this.get(URL + BASE_URL
-                        + "/calendar/earnings?from=" + from + "&to=" + to, EarningsCalendar.class);
+        try{
+            ResponseEntity<EarningsCalendar> earnings = this.get(URL + BASE_URL
+                    + "/calendar/earnings?from=" + from + "&to=" + to, EarningsCalendar.class);
 
-        if(earnings.getBody() != null){
-            return earnings.getBody();
+            if(earnings.getBody() != null){
+                return earnings.getBody();
+            }
+        }catch (BadRequestException e){
+            throw new BadRequestException(e.getMessage());
+        }
+        return null;
+    }
+
+    /**
+     * Technical Indicators
+     * https://finnhub.io/api/v1/indicator?symbol=AAPL&resolution=D&from=1583098857&to=1584308457&indicator=sma&timeperiod=3
+     * @param quote
+     * @param resolution
+     * @param toDate
+     * @param indicator
+     * @param timePeriod
+     * @return stockEma
+     */
+    public EmaDTO getMovingAverage(String quote, String resolution, OffsetDateTime toDate, String indicator, String timePeriod){
+        String from = toDate.minus(2, ChronoUnit.MONTHS).format(DateTimeFormatter.ISO_LOCAL_DATE);
+        String to = toDate.format(DateTimeFormatter.ISO_LOCAL_DATE);
+        log.info("Getting EMA values");
+        try{
+            ResponseEntity<EmaDTO> emaValues = this.get(
+                    URL + BASE_URL + "/indicator?symbol=" + quote + "&resolution="
+                            + resolution + "&from=" + from + "&to=" + to + "&indicator=" + indicator + "&timeperiod=" + timePeriod,
+                    EmaDTO.class
+            );
+            if(emaValues.getBody() != null){
+                return emaValues.getBody();
+            }
+        }catch (BadRequestException e){
+            throw new BadRequestException(e.getMessage());
         }
         return null;
     }

@@ -1,16 +1,18 @@
 package com.laddeep.financeapi.service;
 
-import com.laddeep.financeapi.api.stockPrice.StockPriceDTO;
+import com.laddeep.financeapi.entity.api.EmaDTO;
+import com.laddeep.financeapi.entity.api.StockPriceDTO;
 import com.laddeep.financeapi.component.QuoteBean;
 import com.laddeep.financeapi.component.StockBean;
 import com.laddeep.financeapi.entity.db.Quote;
+import com.laddeep.financeapi.entity.db.StockEma;
 import com.laddeep.financeapi.exceptions.BadRequestException;
 import com.laddeep.financeapi.mapper.StockPriceDTOMapper;
 import com.laddeep.financeapi.integrations.finnhub.FinnhubClient;
 import com.laddeep.financeapi.integrations.finnhub.api.StockPriceQuote;
 import org.springframework.stereotype.Component;
-
 import java.math.BigDecimal;
+import java.time.OffsetDateTime;
 
 @Component
 public class StockService {
@@ -52,4 +54,10 @@ public class StockService {
     public Long saveStockToFollow(Quote quote){
         return stockBean.getFollow(quote);
     }
+
+    public StockEma geStockEmaValues(Quote quote, String timeFrame, String timePeriod){
+        EmaDTO emaValues = this.finnhubClient.getMovingAverage(quote.getQuote(), timeFrame, OffsetDateTime.now(), "ema", timePeriod);
+        return null;
+    }
+
 }

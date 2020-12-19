@@ -1,4 +1,4 @@
-package com.laddeep.financeapi.api.stockPrice;
+package com.laddeep.financeapi.entity.api;
 
 import lombok.Data;
 

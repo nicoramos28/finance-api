@@ -1,6 +1,6 @@
 package com.laddeep.financeapi.service;
 
-import com.laddeep.financeapi.api.stockPrice.StockPriceDTO;
+import com.laddeep.financeapi.entity.api.StockPriceDTO;
 import com.laddeep.financeapi.integrations.telegram.TelegramClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;

@@ -1,6 +1,6 @@
 package com.laddeep.financeapi.mapper;
 
-import com.laddeep.financeapi.api.stockPrice.StockPriceDTO;
+import com.laddeep.financeapi.entity.api.StockPriceDTO;
 import com.laddeep.financeapi.entity.db.StockPrice;
 
 public class StockPriceMapper extends Mapper<StockPrice, StockPriceDTO>{

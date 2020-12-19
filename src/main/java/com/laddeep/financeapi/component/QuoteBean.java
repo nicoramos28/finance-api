@@ -1,6 +1,7 @@
 package com.laddeep.financeapi.component;
 
 import com.laddeep.financeapi.entity.db.Quote;
+import com.laddeep.financeapi.exceptions.PersistenceException;
 import com.laddeep.financeapi.repository.QuoteRepository;
 import org.springframework.stereotype.Component;
 import java.time.OffsetDateTime;
@@ -18,14 +19,20 @@ public class QuoteBean {
     }
 
     public Quote get(String ticker){
+        Quote quote;
         validationBean.notNull("Quote", ticker);
-        Quote quote = quoteRepository.findByQuote(ticker);
-        if(quote == null){
-            quote = new Quote(null,ticker,OffsetDateTime.now());
-        }else{
-            quote.setLastUpdate(OffsetDateTime.now());
+        try{
+            quote = quoteRepository.findByQuote(ticker);
+            if(quote == null){
+                quote = new Quote(null,ticker,OffsetDateTime.now());
+            }else{
+                quote.setLastUpdate(OffsetDateTime.now());
+            }
+            quoteRepository.save(quote);
+        }catch (PersistenceException e){
+            throw new PersistenceException("Error trying to connect to stocks information");
         }
-        quoteRepository.save(quote);
+
         return quote;
     }
 }
