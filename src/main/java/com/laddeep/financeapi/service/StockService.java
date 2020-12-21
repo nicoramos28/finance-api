@@ -1,11 +1,10 @@
 package com.laddeep.financeapi.service;
 
-import com.laddeep.financeapi.entity.api.EmaDTO;
-import com.laddeep.financeapi.entity.api.SmaDTO;
-import com.laddeep.financeapi.entity.api.StockPriceDTO;
+import com.laddeep.financeapi.entity.api.*;
 import com.laddeep.financeapi.component.QuoteBean;
 import com.laddeep.financeapi.component.StockBean;
 import com.laddeep.financeapi.entity.db.Quote;
+import com.laddeep.financeapi.entity.db.StockPrice;
 import com.laddeep.financeapi.exceptions.BadRequestException;
 import com.laddeep.financeapi.mapper.StockPriceDTOMapper;
 import com.laddeep.financeapi.integrations.finnhub.FinnhubClient;
@@ -14,6 +13,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 
 @Component
 @Slf4j
@@ -27,23 +28,27 @@ public class StockService {
 
     private QuoteBean quoteBean;
 
+    private TelegramMessageService messageService;
+
     public StockService(
             StockPriceDTOMapper quoteDtoMapper,
             FinnhubClient finnhubClient,
             StockBean stockBean,
-            QuoteBean quoteBean
+            QuoteBean quoteBean,
+            TelegramMessageService messageService
     ) {
         this.stockPriceMapper = quoteDtoMapper;
         this.finnhubClient = finnhubClient;
         this.stockBean = stockBean;
         this.quoteBean = quoteBean;
+        this.messageService = messageService;
     }
 
     public StockPriceDTO getStockPriceQuote(Quote quote){
         StockPriceQuote response = this.finnhubClient.getStockPriceQuote(quote.getQuote());
         if(response != null){
             if(response.getC().compareTo(BigDecimal.ZERO) != 0){
-                stockBean.get(quote, response);
+                stockBean.get(quote, response, null);
                 return stockPriceMapper.map(response);
             }else{
                 throw new BadRequestException("Ticker could not be found");
@@ -90,4 +95,56 @@ public class StockService {
             log.info("SMA {} value : {}", timePeriod, sma.get());
         }
     }
+
+    public void getCandlesForStock(String ticker){
+        Quote quote = quoteBean.get(ticker);
+        Candle candles = this.finnhubClient.StockWeekCandles(ticker, OffsetDateTime.now());
+
+        if(candles != null){
+            int i = 0;
+            OffsetDateTime day = OffsetDateTime.now().minus(7, ChronoUnit.DAYS);
+            while(i < candles.getV().size()){
+                if((day.getDayOfWeek().name().equals("SATURDAY"))) {
+                    day = day.plus(2, ChronoUnit.DAYS);
+                }else if((day.getDayOfWeek().name().equals("SUNDAY")) || quoteBean.isHolidays(day)){
+                    day = day.plus(1, ChronoUnit.DAYS);
+                }
+                StockPrice candle = new StockPrice();
+                BigDecimal currentPrice = BigDecimal.ZERO;
+                BigDecimal previousClosePrice = BigDecimal.ZERO;
+                if(day.format(DateTimeFormatter.ISO_LOCAL_DATE).equals(OffsetDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE))){
+                    StockPriceDTO stockPrice = this.getStockPriceQuote(quote);
+                    currentPrice = stockPrice.getCurrentPrice();
+                    previousClosePrice = stockPrice.getPreviousClosePrice();
+                }
+                candle.setQuoteId(quote.getId());
+                candle.setOpenPrice(candles.getO().get(i));
+                candle.setClosePrice(candles.getC().get(i));
+                candle.setCurrentPrice(currentPrice);
+                candle.setHighestPrice(candles.getH().get(i));
+                candle.setLowestPrice(candles.getL().get(i));
+                candle.setPreviousClosePrice(previousClosePrice);
+                candle.setTime(day);
+                candle.setVolumen(candles.getV().get(i));
+                day = day.plus(1, ChronoUnit.DAYS);
+                i ++;
+                stockBean.saveCandle(quote, candle, day);
+            }
+        }else{
+            throw new BadRequestException("Invalid Request");
+        }
+    }
+
+    public void technicalMovingAverageAnalytics() {
+        String[] vergaraStocks = {"MDY", "SPY", "VOO", "DIA", "QQQ", "IWM", "VTI", "TLT", "GLD", "FXB",
+                "IBB", "TIP", "AGG", "IEF", "SDY", "FXE", "OIH", "FXY", "REZ", "EFA", "FXA", "SVXY", "XLU",
+                "VNQI", "KRE", "GDX", "IRBO", "VXX", "UVXY", "SCHH", "REET", "FREL", "KBWY", "PSR", "REK",
+                "O", "OHI", "NRZ", "GE", "CYBR", "AXNX", "MCD", "LEN", "RH", "DHI", "TGT", "NLOK", "FDX",
+                "DLA", "FIVN", "HD", "LOW", "VNQ", "XLRE", "LGIH", "KBH"};
+
+        for (String stock : vergaraStocks) {
+            getCandlesForStock(stock);
+        }
+    }
+
 }

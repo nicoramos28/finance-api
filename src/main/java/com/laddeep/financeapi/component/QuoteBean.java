@@ -1,7 +1,9 @@
 package com.laddeep.financeapi.component;
 
 import com.laddeep.financeapi.entity.db.Quote;
+import com.laddeep.financeapi.entity.db.StockExchangeHoliday;
 import com.laddeep.financeapi.exceptions.PersistenceException;
+import com.laddeep.financeapi.repository.ExchangeHolidaysRepository;
 import com.laddeep.financeapi.repository.QuoteRepository;
 import org.springframework.stereotype.Component;
 import java.time.OffsetDateTime;
@@ -13,9 +15,12 @@ public class QuoteBean {
 
     private ValidationBean validationBean;
 
-    public QuoteBean(QuoteRepository quoteRepository, ValidationBean validationBean) {
+    private ExchangeHolidaysRepository holidaysRepository;
+
+    public QuoteBean(QuoteRepository quoteRepository, ValidationBean validationBean, ExchangeHolidaysRepository holidaysRepository) {
         this.quoteRepository = quoteRepository;
         this.validationBean = validationBean;
+        this.holidaysRepository = holidaysRepository;
     }
 
     public Quote get(String ticker){
@@ -32,7 +37,11 @@ public class QuoteBean {
         }catch (PersistenceException e){
             throw new PersistenceException("Error trying to connect to stocks information");
         }
-
         return quote;
+    }
+
+    public Boolean isHolidays(OffsetDateTime today){
+        StockExchangeHoliday holiday = holidaysRepository.findByDate(today);
+        return holiday != null;
     }
 }

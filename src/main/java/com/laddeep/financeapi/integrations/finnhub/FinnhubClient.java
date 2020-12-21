@@ -1,5 +1,6 @@
 package com.laddeep.financeapi.integrations.finnhub;
 
+import com.laddeep.financeapi.entity.api.Candle;
 import com.laddeep.financeapi.entity.api.EmaDTO;
 import com.laddeep.financeapi.entity.api.SmaDTO;
 import com.laddeep.financeapi.exceptions.BadRequestException;
@@ -52,7 +53,7 @@ public class FinnhubClient {
     }
 
     /**
-     * Stock Price Quoute
+     * Stock Price Quote
      * https://finnhub.io/api/v1/quote?symbol=AAPL&token=
      * @param quote
      * @return stockPriceQuote
@@ -72,6 +73,29 @@ public class FinnhubClient {
     }
 
     /**
+     * Candles Price
+     * https://finnhub.io/api/v1/stock/candle?symbol=AAPL&resolution=D&from=1605543327&to=1605629727
+     * @param quote
+     * @param toDate
+     * @return
+     */
+    public Candle StockWeekCandles(String quote, OffsetDateTime toDate){
+        log.info("Getting Candles of : {} - until : {}", quote, toDate.format(DateTimeFormatter.ISO_LOCAL_DATE));
+        try{
+            ResponseEntity<Candle> candles = this.get(URL + BASE_URL
+                    + "/stock/candle?symbol=" + quote + "&resolution=D&from=" + toDate.minus(7, ChronoUnit.DAYS).toEpochSecond()
+                    + "&to=" + toDate.toEpochSecond(), Candle.class);
+
+            if(candles.getBody() != null){
+                return candles.getBody();
+            }
+        }catch (BadRequestException e){
+            throw new BadRequestException(e.getMessage());
+        }
+        return null;
+    }
+
+    /**
      * Earnings Calendar
      * https://finnhub.io/api/v1/calendar/earnings?from=2020-03-12&to=2020-03-15
      * @param fromDate
@@ -79,12 +103,11 @@ public class FinnhubClient {
      * @return
      */
     public EarningsCalendar getEarnings(OffsetDateTime fromDate, OffsetDateTime toDate){
-        String from = fromDate.format(DateTimeFormatter.ISO_LOCAL_DATE);
-        String to = toDate.format(DateTimeFormatter.ISO_LOCAL_DATE);
-        log.info("Getting earnings from : {} - to : {}", from, to);
+        log.info("Getting earnings from : {} - to : {}", fromDate.format(DateTimeFormatter.ISO_LOCAL_DATE), toDate.format(DateTimeFormatter.ISO_LOCAL_DATE));
         try{
             ResponseEntity<EarningsCalendar> earnings = this.get(URL + BASE_URL
-                    + "/calendar/earnings?from=" + from + "&to=" + to, EarningsCalendar.class);
+                    + "/calendar/earnings?from=" + fromDate.format(DateTimeFormatter.ISO_LOCAL_DATE)
+                    + "&to=" + toDate.format(DateTimeFormatter.ISO_LOCAL_DATE), EarningsCalendar.class);
 
             if(earnings.getBody() != null){
                 return earnings.getBody();

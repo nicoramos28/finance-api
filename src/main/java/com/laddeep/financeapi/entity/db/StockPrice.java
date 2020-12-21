@@ -28,23 +28,33 @@ public class StockPrice {
     @Column(name = "open")
     private BigDecimal openPrice;
 
+    @Column(name = "close")
+    private BigDecimal closePrice;
+
     @Column(name = "previous_close")
     private BigDecimal previousClosePrice;
 
     @Column(name = "date")
     private OffsetDateTime time;
 
+    @Column(name = "volumen")
+    private double volumen;
+
     public StockPrice(){}
 
-    public StockPrice(Long id, Long quoteId, BigDecimal currentPrice, BigDecimal highestPrice, BigDecimal lowestPrice, BigDecimal openPrice, BigDecimal previousClosePrice, OffsetDateTime time) {
+    public StockPrice(Long id, Long quoteId, BigDecimal currentPrice, BigDecimal highestPrice,
+                      BigDecimal lowestPrice, BigDecimal openPrice, BigDecimal closePrice,
+                      BigDecimal previousClosePrice, OffsetDateTime time, double volumen) {
         this.id = id;
         this.quoteId = quoteId;
         this.currentPrice = currentPrice;
         this.highestPrice = highestPrice;
         this.lowestPrice = lowestPrice;
         this.openPrice = openPrice;
+        this.closePrice = closePrice;
         this.previousClosePrice = previousClosePrice;
         this.time = time;
+        this.volumen = volumen;
     }
 
     public Long getId() {
@@ -95,9 +105,11 @@ public class StockPrice {
         this.openPrice = openPrice;
     }
 
-    public BigDecimal getPreviousClosePrice() {
-        return previousClosePrice;
-    }
+    public BigDecimal getClosePrice() { return closePrice; }
+
+    public void setClosePrice(BigDecimal close) { this.closePrice = close;  }
+
+    public BigDecimal getPreviousClosePrice() { return previousClosePrice; }
 
     public void setPreviousClosePrice(BigDecimal previousClosePrice) {
         this.previousClosePrice = previousClosePrice;
@@ -111,6 +123,11 @@ public class StockPrice {
         this.time = time;
     }
 
+    public double getVolumen() { return volumen; }
+
+    public void setVolumen(double volumen) { this.volumen = volumen; }
+
+
     @Override
     public String toString() {
         return "StockPrice{" +
@@ -120,8 +137,11 @@ public class StockPrice {
                 ", highestPrice=" + highestPrice +
                 ", lowestPrice=" + lowestPrice +
                 ", openPrice=" + openPrice +
+                ", close=" + closePrice +
                 ", previousClosePrice=" + previousClosePrice +
                 ", time=" + time +
+                ", volumen=" + volumen +
                 '}';
     }
+
 }

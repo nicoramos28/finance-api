@@ -43,9 +43,10 @@ public class StockBean {
         this.smaRepository = smaRepository;
     }
 
-    public void get(Quote quote, StockPriceQuote stockPrices) {
+    public void get(Quote quote, StockPriceQuote stockPrices, OffsetDateTime date) {
         validationBean.notNull("StockPrices", stockPrices);
-        StockPrice stock = stockPriceRepository.findByQuoteIdAndTime(quote.getId(), OffsetDateTime.now());
+        date = (date == null)? OffsetDateTime.now() : date;
+        StockPrice stock = stockPriceRepository.findByQuoteIdAndTime(quote.getId(), date);
         try{
             if(stock == null){
                 stock = new StockPrice(
@@ -55,29 +56,24 @@ public class StockBean {
                         stockPrices.getH(),
                         stockPrices.getL(),
                         stockPrices.getO(),
+                        BigDecimal.ZERO,
                         stockPrices.getPc(),
-                        OffsetDateTime.now()
+                        OffsetDateTime.now(),
+                        0
                 );
                 log.info("Saving new Stock Price to {}", quote.getQuote());
             }else{
-                if(stock.getCurrentPrice().equals(BigDecimal.ZERO)){
-                    stock.setCurrentPrice(stockPrices.getC());
-                    stock.setHighestPrice(stockPrices.getH());
-                    stock.setLowestPrice(stockPrices.getL());
-                    stock.setOpenPrice(stockPrices.getO());
-                    stock.setPreviousClosePrice(stockPrices.getPc());
-                    log.info("Updating Stock Price to {}", quote.getQuote());
-                }
                 stock.setCurrentPrice(stockPrices.getC());
                 stock.setHighestPrice(stockPrices.getH());
                 stock.setLowestPrice(stockPrices.getL());
+                stock.setOpenPrice(stockPrices.getO());
+                stock.setPreviousClosePrice(stockPrices.getPc());
                 log.info("Updating Stock Price to {}", quote.getQuote());
             }
             stockPriceRepository.save(stock);
         }catch (PersistenceException e){
             throw new PersistenceException("Error trying to get, update or insert new Stock information");
         }
-
     }
 
     public Long getFollow(Quote quote){
@@ -181,6 +177,39 @@ public class StockBean {
             emaRepository.save(ema);
         }catch (PersistenceException e){
             throw new PersistenceException("Error trying to get, update or insert new SMA information");
+        }
+    }
+
+    public void saveCandle(Quote quote, StockPrice candle, OffsetDateTime date){
+        validationBean.notNull("StockPrices", candle);
+        date = (date == null)? OffsetDateTime.now() : date;
+        StockPrice stock = stockPriceRepository.findByQuoteIdAndTime(quote.getId(), date);
+        try{
+            if(stock == null){
+                stock = new StockPrice(
+                        null,
+                        quote.getId(),
+                        candle.getCurrentPrice(),
+                        candle.getHighestPrice(),
+                        candle.getLowestPrice(),
+                        candle.getOpenPrice(),
+                        candle.getClosePrice(),
+                        candle.getPreviousClosePrice(),
+                        candle.getTime(),
+                        candle.getVolumen()
+                );
+                log.info("Saving new Candle Price to {} - date {}", quote.getQuote(), date);
+            }else{
+                stock.setClosePrice(candle.getPreviousClosePrice());
+                stock.setHighestPrice(candle.getHighestPrice());
+                stock.setLowestPrice(candle.getLowestPrice());
+                stock.setOpenPrice(candle.getOpenPrice());
+                stock.setVolumen(candle.getVolumen());
+                log.info("Updating Candle Price to {}", quote.getQuote());
+            }
+            stockPriceRepository.save(stock);
+        }catch (PersistenceException e){
+            throw new PersistenceException("Error trying to get, update or insert new Candle information");
         }
     }
 }

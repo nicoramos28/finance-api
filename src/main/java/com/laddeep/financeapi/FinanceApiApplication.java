@@ -25,12 +25,13 @@ public class FinanceApiApplication {
 		SpringApplication.run(FinanceApiApplication.class, args);
 	}
 
-	@Scheduled(fixedDelay = 300000L)
+	@Scheduled(fixedDelay = 10000L)
 	public void financeApiRunner() throws IOException, InterruptedException {
 		log.info("\n######################################## Runner started ########################################");
-		earningService.getDailyEarning();
-		stockService.geStockEmaValues("AAPL", null);
-		stockService.geStockSmaValues("AAPL", null);
+		//earningService.getDailyEarning();
+		//stockService.geStockEmaValues("AAPL", null);
+		//stockService.geStockSmaValues("AAPL", null);
+		stockService.technicalMovingAverageAnalytics();
 		log.info("\n######################################## Runner finished ########################################\n");
 	}
 }
