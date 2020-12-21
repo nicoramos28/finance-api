@@ -126,9 +126,9 @@ public class StockService {
                 candle.setPreviousClosePrice(previousClosePrice);
                 candle.setTime(day);
                 candle.setVolumen(candles.getV().get(i));
+                stockBean.saveCandle(quote, candle, day);
                 day = day.plus(1, ChronoUnit.DAYS);
                 i ++;
-                stockBean.saveCandle(quote, candle, day);
             }
         }else{
             throw new BadRequestException("Invalid Request");

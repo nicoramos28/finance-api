@@ -25,7 +25,7 @@ public class FinanceApiApplication {
 		SpringApplication.run(FinanceApiApplication.class, args);
 	}
 
-	@Scheduled(fixedDelay = 10000L)
+	@Scheduled(fixedDelay = 200000L)
 	public void financeApiRunner() throws IOException, InterruptedException {
 		log.info("\n######################################## Runner started ########################################");
 		//earningService.getDailyEarning();
