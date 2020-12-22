@@ -12,7 +12,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
@@ -20,7 +20,7 @@ import java.time.temporal.ChronoUnit;
 
 
 @Slf4j
-@Component
+@Service
 public class FinnhubClient {
 
     @Value("${finnhub.url}")

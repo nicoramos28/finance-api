@@ -42,9 +42,16 @@ public class StockPrice {
 
     public StockPrice(){}
 
-    public StockPrice(Long id, Long quoteId, BigDecimal currentPrice, BigDecimal highestPrice,
-                      BigDecimal lowestPrice, BigDecimal openPrice, BigDecimal closePrice,
-                      BigDecimal previousClosePrice, OffsetDateTime time, double volumen) {
+    public StockPrice(Long id,
+                      Long quoteId,
+                      BigDecimal currentPrice,
+                      BigDecimal highestPrice,
+                      BigDecimal lowestPrice,
+                      BigDecimal openPrice,
+                      BigDecimal closePrice,
+                      BigDecimal previousClosePrice,
+                      OffsetDateTime time,
+                      double volumen) {
         this.id = id;
         this.quoteId = quoteId;
         this.currentPrice = currentPrice;

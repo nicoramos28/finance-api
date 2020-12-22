@@ -7,11 +7,12 @@ import com.laddeep.financeapi.integrations.finnhub.FinnhubClient;
 import com.laddeep.financeapi.integrations.finnhub.api.EarningsCalendar;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.time.OffsetDateTime;
 
-@Component
 @Slf4j
+@Service
 public class EarningService {
 
     private QuoteBean quoteBean;

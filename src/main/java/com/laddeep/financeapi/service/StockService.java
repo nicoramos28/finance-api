@@ -18,7 +18,7 @@ import java.time.temporal.ChronoUnit;
 
 @Component
 @Slf4j
-public class StockService {
+public class StockService{
 
     private StockPriceDTOMapper stockPriceMapper;
 
@@ -28,20 +28,16 @@ public class StockService {
 
     private QuoteBean quoteBean;
 
-    private TelegramMessageService messageService;
-
     public StockService(
             StockPriceDTOMapper quoteDtoMapper,
             FinnhubClient finnhubClient,
             StockBean stockBean,
-            QuoteBean quoteBean,
-            TelegramMessageService messageService
+            QuoteBean quoteBean
     ) {
         this.stockPriceMapper = quoteDtoMapper;
         this.finnhubClient = finnhubClient;
         this.stockBean = stockBean;
         this.quoteBean = quoteBean;
-        this.messageService = messageService;
     }
 
     public StockPriceDTO getStockPriceQuote(Quote quote){
@@ -99,7 +95,6 @@ public class StockService {
     public void getCandlesForStock(String ticker){
         Quote quote = quoteBean.get(ticker);
         Candle candles = this.finnhubClient.StockWeekCandles(ticker, OffsetDateTime.now());
-
         if(candles != null){
             int i = 0;
             OffsetDateTime day = OffsetDateTime.now().minus(7, ChronoUnit.DAYS);
@@ -134,17 +129,8 @@ public class StockService {
             throw new BadRequestException("Invalid Request");
         }
     }
-
-    public void technicalMovingAverageAnalytics() {
-        String[] vergaraStocks = {"MDY", "SPY", "VOO", "DIA", "QQQ", "IWM", "VTI", "TLT", "GLD", "FXB",
-                "IBB", "TIP", "AGG", "IEF", "SDY", "FXE", "OIH", "FXY", "REZ", "EFA", "FXA", "SVXY", "XLU",
-                "VNQI", "KRE", "GDX", "IRBO", "VXX", "UVXY", "SCHH", "REET", "FREL", "KBWY", "PSR", "REK",
-                "O", "OHI", "NRZ", "GE", "CYBR", "AXNX", "MCD", "LEN", "RH", "DHI", "TGT", "NLOK", "FDX",
-                "DLA", "FIVN", "HD", "LOW", "VNQ", "XLRE", "LGIH", "KBH"};
-
-        for (String stock : vergaraStocks) {
-            getCandlesForStock(stock);
-        }
-    }
-
 }
+
+
+
+

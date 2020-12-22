@@ -1,6 +1,8 @@
 package com.laddeep.financeapi;
 
-import com.laddeep.financeapi.service.EarningService;
+import com.laddeep.financeapi.runner.Monitor;
+import com.laddeep.financeapi.runner.SenderFARunner;
+import com.laddeep.financeapi.runner.TriggerFARunner;
 import com.laddeep.financeapi.service.StockService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,22 +18,20 @@ import java.io.IOException;
 public class FinanceApiApplication {
 
 	@Autowired
-	EarningService earningService;
-
-	@Autowired
 	StockService stockService;
 
 	public static void main(String[] args) {
 		SpringApplication.run(FinanceApiApplication.class, args);
 	}
 
-	@Scheduled(fixedDelay = 200000L)
-	public void financeApiRunner() throws IOException, InterruptedException {
-		log.info("\n######################################## Runner started ########################################");
-		//earningService.getDailyEarning();
-		//stockService.geStockEmaValues("AAPL", null);
-		//stockService.geStockSmaValues("AAPL", null);
-		stockService.technicalMovingAverageAnalytics();
-		log.info("\n######################################## Runner finished ########################################\n");
+	@Scheduled(fixedDelay = 780000L)
+	public void earningsRunner() throws IOException, InterruptedException {
+		log.info("\n######################################## Start Finance-API Runner ########################################");
+		Monitor monitor = new Monitor();
+		Thread sender = new Thread(new SenderFARunner(monitor));
+		Thread receive = new Thread(new TriggerFARunner(monitor, stockService));
+
+		sender.start();
+		receive.start();
 	}
 }
