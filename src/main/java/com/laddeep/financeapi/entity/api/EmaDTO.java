@@ -2,35 +2,109 @@ package com.laddeep.financeapi.entity.api;
 
 import lombok.Data;
 import java.math.BigDecimal;
-import java.util.List;
+import java.sql.Timestamp;
 
 @Data
 public class EmaDTO {
 
-    private List<BigDecimal> ema;
+    private BigDecimal ema;
 
-    public EmaDTO(){}
+    private BigDecimal c;
 
-    public EmaDTO(List<BigDecimal> ema) {
+    private BigDecimal h;
+
+    private BigDecimal l;
+
+    private BigDecimal o;
+
+    private Double v;
+
+    private Timestamp t;
+
+    public EmaDTO(){};
+
+    public EmaDTO(BigDecimal ema,
+                  BigDecimal c,
+                  BigDecimal h,
+                  BigDecimal l,
+                  BigDecimal o,
+                  Double v,
+                  Timestamp t) {
         this.ema = ema;
+        this.c = c;
+        this.h = h;
+        this.l = l;
+        this.o = o;
+        this.v = v;
+        this.t = t;
     }
 
-    public List<BigDecimal> getEma() {
+    public BigDecimal getEma() {
         return ema;
     }
 
-    public void setEma(List<BigDecimal> ema) {
+    public void setEma(BigDecimal ema) {
         this.ema = ema;
     }
 
-    public BigDecimal get(){
-        return ema.get(ema.size()-1);
+    public BigDecimal getC() {
+        return c;
+    }
+
+    public void setC(BigDecimal c) {
+        this.c = c;
+    }
+
+    public BigDecimal getH() {
+        return h;
+    }
+
+    public void setH(BigDecimal h) {
+        this.h = h;
+    }
+
+    public BigDecimal getL() {
+        return l;
+    }
+
+    public void setL(BigDecimal l) {
+        this.l = l;
+    }
+
+    public BigDecimal getO() {
+        return o;
+    }
+
+    public void setO(BigDecimal o) {
+        this.o = o;
+    }
+
+    public Double getV() {
+        return v;
+    }
+
+    public void setV(Double v) {
+        this.v = v;
+    }
+
+    public Timestamp getT() {
+        return t;
+    }
+
+    public void setT(Timestamp t) {
+        this.t = t;
     }
 
     @Override
     public String toString() {
         return "EmaDTO{" +
                 "ema=" + ema +
+                ", c=" + c +
+                ", h=" + h +
+                ", l=" + l +
+                ", o=" + o +
+                ", v=" + v +
+                ", t=" + t +
                 '}';
     }
 }

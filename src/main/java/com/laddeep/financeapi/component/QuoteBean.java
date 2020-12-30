@@ -7,6 +7,7 @@ import com.laddeep.financeapi.repository.ExchangeHolidaysRepository;
 import com.laddeep.financeapi.repository.QuoteRepository;
 import org.springframework.stereotype.Component;
 import java.time.OffsetDateTime;
+import java.time.format.DateTimeFormatter;
 
 @Component
 public class QuoteBean {
@@ -41,7 +42,7 @@ public class QuoteBean {
     }
 
     public Boolean isHolidays(OffsetDateTime today){
-        StockExchangeHoliday holiday = holidaysRepository.findByDate(today);
+        StockExchangeHoliday holiday = holidaysRepository.findByDate(today.format(DateTimeFormatter.ISO_LOCAL_DATE));
         return holiday != null;
     }
 }

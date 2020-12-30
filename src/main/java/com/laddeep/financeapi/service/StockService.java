@@ -44,7 +44,7 @@ public class StockService{
         StockPriceQuote response = this.finnhubClient.getStockPriceQuote(quote.getQuote());
         if(response != null){
             if(response.getC().compareTo(BigDecimal.ZERO) != 0){
-                stockBean.get(quote, response, null);
+                stockBean.saveStockPrice(quote, response);
                 return stockPriceMapper.map(response);
             }else{
                 throw new BadRequestException("Ticker could not be found");
@@ -55,82 +55,91 @@ public class StockService{
     }
 
     public Long saveStockToFollow(Quote quote){
-        return stockBean.getFollow(quote);
+        return stockBean.saveStockToFollow(quote);
     }
 
-    public void geStockEmaValues(String ticker, Integer timePeriod){
+    public void geStockEmaSmaValues(String ticker){
         Quote quote = quoteBean.get(ticker);
         //Getting current stock price
-        StockPriceDTO stockPrice = this.getStockPriceQuote(quote);
-        EmaDTO ema7 = this.finnhubClient.getMovingAverage(quote.getQuote(), OffsetDateTime.now(), EmaDTO.class, 7);
-        EmaDTO ema30 = this.finnhubClient.getMovingAverage(quote.getQuote(), OffsetDateTime.now(), EmaDTO.class, 30);
-        log.info("EMA 7 value : {}", ema7.get());
-        stockBean.saveEma(quote, ema7.get(), 7, ema7.get().compareTo(stockPrice.getCurrentPrice()));
-
-        log.info("EMA 30 value : {}", ema30.get());
-        stockBean.saveEma(quote, ema30.get(), 30, ema30.get().compareTo(stockPrice.getCurrentPrice()));
-
-        if(timePeriod != null){
-            EmaDTO ema = this.finnhubClient.getMovingAverage(quote.getQuote(), OffsetDateTime.now(), EmaDTO.class, timePeriod);
-            stockBean.saveEma(quote, ema.get(), timePeriod, ema7.get().compareTo(stockPrice.getCurrentPrice()));
-            log.info("EMA {} value : {}", timePeriod, ema.get());
-        }
-    }
-
-    public void geStockSmaValues(String ticker, Integer timePeriod){
-        Quote quote = quoteBean.get(ticker);
-        //Getting current stock price
-        StockPriceDTO stockPrice = this.getStockPriceQuote(quote);
-        SmaDTO sma200 = this.finnhubClient.getMovingAverage(quote.getQuote(), OffsetDateTime.now(), SmaDTO.class, 200);
-        log.info("SMA 200 value : {}", sma200.get());
-        stockBean.saveSma(quote, sma200.get(), 200, sma200.get().compareTo(stockPrice.getCurrentPrice()));
-
-        if(timePeriod != null){
-            SmaDTO sma = this.finnhubClient.getMovingAverage(quote.getQuote(), OffsetDateTime.now(), SmaDTO.class, timePeriod);
-            stockBean.saveSma(quote, sma.get(), timePeriod, sma200.get().compareTo(stockPrice.getCurrentPrice()));
-            log.info("SMA {} value : {}", timePeriod, sma.get());
-        }
-    }
-
-    public void getCandlesForStock(String ticker){
-        Quote quote = quoteBean.get(ticker);
-        Candle candles = this.finnhubClient.StockWeekCandles(ticker, OffsetDateTime.now());
-        if(candles != null){
-            int i = 0;
-            OffsetDateTime day = OffsetDateTime.now().minus(7, ChronoUnit.DAYS);
-            while(i < candles.getV().size()){
-                if((day.getDayOfWeek().name().equals("SATURDAY"))) {
-                    day = day.plus(2, ChronoUnit.DAYS);
-                }else if((day.getDayOfWeek().name().equals("SUNDAY")) || quoteBean.isHolidays(day)){
-                    day = day.plus(1, ChronoUnit.DAYS);
+        EmasDTO ema7 = this.finnhubClient.getMovingAverage(quote.getQuote(), OffsetDateTime.now(), EmasDTO.class, 7);
+        EmasDTO ema30 = this.finnhubClient.getMovingAverage(quote.getQuote(), OffsetDateTime.now(), EmasDTO.class, 30);
+        SmasDTO sma200 = this.finnhubClient.getMovingAverage(quote.getQuote(), OffsetDateTime.now(), SmasDTO.class, 200);
+        EmaDTO e7 = null;
+        EmaDTO e30 = null;
+        SmaDTO s200 = null;
+        OffsetDateTime day = OffsetDateTime.now();
+        int i = 1;
+        if(ema7 != null){
+            while(i < 4){
+                while(day.getDayOfWeek().name().equals("SATURDAY") || day.getDayOfWeek().name().equals("SUNDAY") || quoteBean.isHolidays(day)){
+                    if((day.getDayOfWeek().name().equals("SATURDAY")) || quoteBean.isHolidays(day)) {
+                        day = day.minus(1, ChronoUnit.DAYS);
+                    }else if((day.getDayOfWeek().name().equals("SUNDAY"))){
+                        day = day.minus(2, ChronoUnit.DAYS);
+                    }
                 }
-                StockPrice candle = new StockPrice();
+                e7 = ema7.retreiveEma(ema7, i);
+                e30 = ema30.retreiveEma(ema30, i);
+                s200 = sma200.retreiveSma(sma200, i);
                 BigDecimal currentPrice = BigDecimal.ZERO;
-                BigDecimal previousClosePrice = BigDecimal.ZERO;
-                if(day.format(DateTimeFormatter.ISO_LOCAL_DATE).equals(OffsetDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE))){
-                    StockPriceDTO stockPrice = this.getStockPriceQuote(quote);
-                    currentPrice = stockPrice.getCurrentPrice();
-                    previousClosePrice = stockPrice.getPreviousClosePrice();
+                BigDecimal previousClose = BigDecimal.ZERO;
+                BigDecimal closePrice = BigDecimal.ZERO;
+
+                //Updating or Create new Candle information
+                StockPrice stockToSave = new StockPrice();
+                stockToSave.setQuoteId(quote.getId());
+                stockToSave.setTime(day);
+                stockToSave.setHighestPrice(e7.getH());
+                stockToSave.setLowestPrice(e7.getL());
+                stockToSave.setOpenPrice(e7.getO());
+                stockToSave.setVolumen(e7.getV());
+
+                if((day.format(DateTimeFormatter.ISO_LOCAL_DATE).equals(
+                        OffsetDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE))) &&
+                        !(day.getDayOfWeek().name().equals("SATURDAY")) &&
+                        !(day.getDayOfWeek().name().equals("SUNDAY")) &&
+                        !(quoteBean.isHolidays(day))){
+                    StockPriceDTO stockDb = this.getStockPriceQuote(quote);
+                    currentPrice = stockDb.getCurrentPrice();
+                    previousClose = stockDb.getPreviousClosePrice();
+                }else{
+                    StockPrice stock = stockBean.getStockPrice(quote.getId(), day);
+                    if(stock != null){
+                        currentPrice = (stock.getCurrentPrice().equals(BigDecimal.ZERO))? BigDecimal.ZERO : stock.getCurrentPrice();
+                        previousClose = (stock.getPreviousClosePrice().equals(BigDecimal.ZERO))? BigDecimal.ZERO : stock.getPreviousClosePrice();
+                        closePrice = (stock.getClosePrice().equals(BigDecimal.ZERO))? BigDecimal.ZERO : stock.getClosePrice();
+                    }else{
+                        closePrice = e7.getC();
+                    }
                 }
-                candle.setQuoteId(quote.getId());
-                candle.setOpenPrice(candles.getO().get(i));
-                candle.setClosePrice(candles.getC().get(i));
-                candle.setCurrentPrice(currentPrice);
-                candle.setHighestPrice(candles.getH().get(i));
-                candle.setLowestPrice(candles.getL().get(i));
-                candle.setPreviousClosePrice(previousClosePrice);
-                candle.setTime(day);
-                candle.setVolumen(candles.getV().get(i));
-                stockBean.saveCandle(quote, candle, day);
-                day = day.plus(1, ChronoUnit.DAYS);
-                i ++;
+
+                stockToSave.setClosePrice(closePrice);
+                stockToSave.setCurrentPrice(currentPrice);
+                stockToSave.setPreviousClosePrice(previousClose);
+                stockBean.saveStockCandle(quote.getId(),day,stockToSave);
+
+                log.info("EMA 7 value : {} to date : {}", e7.getEma(), day.format(DateTimeFormatter.ISO_LOCAL_DATE));
+                log.info("EMA 30 value : {} to date : {}", e30.getEma(), day.format(DateTimeFormatter.ISO_LOCAL_DATE));
+                log.info("SMA 200 value : {} to date : {}", s200.getSma(), day.format(DateTimeFormatter.ISO_LOCAL_DATE));
+                if((day.format(DateTimeFormatter.ISO_LOCAL_DATE).equals(
+                        OffsetDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE))) &&
+                        !(day.getDayOfWeek().name().equals("SATURDAY")) &&
+                        !(day.getDayOfWeek().name().equals("SUNDAY")) &&
+                        !(quoteBean.isHolidays(day))){
+                    stockBean.saveEma(quote, e7.getEma(), 7, e7.getEma().compareTo(currentPrice), day);
+                    stockBean.saveEma(quote, e30.getEma(), 30, e30.getEma().compareTo(currentPrice), day);
+                    stockBean.saveSma(quote, s200.getSma(), 200, s200.getSma().compareTo(currentPrice), day);
+                }else{
+                    stockBean.saveEma(quote, e7.getEma(), 7, e7.getEma().compareTo(closePrice), day);
+                    stockBean.saveEma(quote, e30.getEma(), 30, e30.getEma().compareTo(closePrice), day);
+                    stockBean.saveSma(quote, s200.getSma(), 200, s200.getSma().compareTo(closePrice), day);
+                }
+                day = day.minus(1, ChronoUnit.DAYS);
+                i++;
             }
         }else{
-            throw new BadRequestException("Invalid Request");
+            throw new BadRequestException("Invalid EMAs values");
         }
     }
+
 }
-
-
-
-

@@ -17,4 +17,8 @@ public interface StockPriceRepository extends JpaRepository<StockPrice, Long> {
     @Query(value = "SELECT * FROM stock_price sp WHERE sp.id_quote = ? order by date desc limit 3",
             nativeQuery = true)
     List<StockPrice> findLastCandles(Long idQuote);
+
+    @Query(value = "SELECT * FROM stock_price sp WHERE sp.id_quote = ? order by date desc limit 1",
+            nativeQuery = true)
+    StockPrice findLastCandle(Long idQuote);
 }

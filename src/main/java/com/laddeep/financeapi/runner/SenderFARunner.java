@@ -10,12 +10,31 @@ public class SenderFARunner implements Runnable{
 
     private Monitor monitor;
 
-    private final String[] watchList = {"MDY", "SPY", "VOO", "DIA", "QQQ", "IWM", "VTI", "TLT", "GLD", "FXB",
-            "IBB", "TIP", "AGG", "IEF", "SDY", "FXE", "OIH", "FXY", "REZ", "EFA", "FXA", "SVXY", "XLU",
-            "VNQI", "KRE", "GDX", "IRBO", "VXX", "UVXY", "SCHH", "REET", "FREL", "KBWY", "PSR", "REK",
-            "O", "OHI", "NRZ", "GE", "CYBR", "AXNX", "MCD", "LEN", "RH", "DHI", "TGT", "NLOK", "FDX",
-            "DLA", "FIVN", "HD", "LOW", "VNQ", "XLRE", "LGIH", "KBH"};
+    String[] watchList = {"CRM","FB","MSFT","BABA","AAPL","BA","NVDA","AMZN","SPY",
+                                        "UAL","UBER","VIAC","VZ","WFC","WORK","X","XOM","TME","TSM",
+                                        "TWTR","SNAP","SONO","SPCE","SPG","STWD","T","TCOM",
+                                        "TEVA","PAGS","PCG","PFE","PTON","RF","SAVE","SBUX","SLB",
+                                        "MUR","NEM","NG","NIO","NKE","ON","ORCL","OXY","LUV","LYFT",
+                                        "LYV","MGM","MPW","MS","MU","INTC","IQ","JBLU","JPM","KHC",
+                                        "KMI","KO","LEVI","GM","GOLD","GPS","GRPN","GSX","HAL","HLT",
+                                        "HPQ","DIS","DKNG","FCX","FEYE","GE","GILD","GIS","CHWY",
+                                        "CMCSA","CNX","CSCO","CVS","CVX","DAL","DELL","BILI","BLMN",
+                                        "BMY","BOX","BP","BSX","C","CCL","AAL","AMD","APA","ATVI",
+                                        "BAC","BBBY","CNTG","QTT","LEN","DL","BLBD","AEY","TTC",
+                                        "MLHR","ABM","NAV","SCHL","UXIN","APDN","RFIL","BB","WOR",
+                                        "JBL","SCS","FDX","SAFM","RAD","ACN","CAMP","AIR",
+                                        "TC","APOG","MDY","VOO","DIA","QQQ","IWM","VTI","TLT",
+                                        "GLD","FXB","IBB","TIP","AGG","IEF","SDY","FXE","OIH","FXY",
+                                        "REZ","EFA","FXA","SVXY","XLU","VNQI","KRE","GDX","IRBO",
+                                        "VXX","UVXY","SCHH","REET","FREL","KBWY","PSR","REK","O",
+                                        "OHI","NRZ","CYBR","AXNX","MCD","RH","DHI","TGT","NLOK",
+                                        "DLA","FIVN","HD","LOW","VNQ","XLRE","LGIH","KBH","OCC",
+                                        "VNCE","HEI","CVGW","EPAC","FDS","ZNGA", "ZM", "M", "PLUG",
+                                        "SQ", "KNDI", "FUBO", "BLNK", "MRVL", "SWN", "NOK", "SPXS",
+                                        "TZA", "MRO", "SRNE", "NNDM", "F", "TEVA", "INO",
+                                        "GNUS", "ITUB", "ET", "ACB", "NLY", "SNDL"};
 
+    //from SWN low cost. Exclude for short period in NYSE "MNSO",
     public SenderFARunner(Monitor monitor) {
         this.monitor = monitor;
     }

@@ -43,10 +43,9 @@ public class StockBean {
         this.smaRepository = smaRepository;
     }
 
-    public void get(Quote quote, StockPriceQuote stockPrices, OffsetDateTime date) {
+    public void saveStockPrice(Quote quote, StockPriceQuote stockPrices) {
         validationBean.notNull("StockPrices", stockPrices);
-        date = (date == null)? OffsetDateTime.now() : date;
-        StockPrice stock = stockPriceRepository.findByQuoteIdAndTime(quote.getId(), date);
+        StockPrice stock = stockPriceRepository.findByQuoteIdAndTime(quote.getId(), OffsetDateTime.now());
         try{
             if(stock == null){
                 stock = new StockPrice(
@@ -76,7 +75,43 @@ public class StockBean {
         }
     }
 
-    public Long getFollow(Quote quote){
+    public StockPrice getStockPrice(Long quoteId, OffsetDateTime date){
+        try{
+            StockPrice stock = stockPriceRepository.findByQuoteIdAndTime(quoteId, date);
+            if(stock != null){
+                return  stock;
+            }
+        }catch (PersistenceException e){
+            throw new PersistenceException("Error trying to get Stock information");
+        }
+        return null;
+    }
+
+    public void saveStockCandle(Long quoteId, OffsetDateTime date, StockPrice stockToSave){
+        try{
+            StockPrice stock = stockPriceRepository.findByQuoteIdAndTime(quoteId, date);
+            if(stock != null){
+                if(stock.getCurrentPrice().compareTo(BigDecimal.ZERO) != 0
+                        && stockToSave.getCurrentPrice().compareTo(BigDecimal.ZERO) == 0){
+                    stockToSave.setCurrentPrice(stock.getCurrentPrice());
+                }
+                if(stock.getClosePrice().compareTo(BigDecimal.ZERO) != 0
+                        && stockToSave.getClosePrice().compareTo(BigDecimal.ZERO) == 0){
+                    stockToSave.setClosePrice(stock.getClosePrice());
+                }
+                if(stock.getPreviousClosePrice().compareTo(BigDecimal.ZERO) != 0
+                        && stockToSave.getPreviousClosePrice().compareTo(BigDecimal.ZERO) == 0){
+                    stockToSave.setPreviousClosePrice(stock.getPreviousClosePrice());
+                }
+                stockToSave.setId(stock.getId());
+            }
+            stockPriceRepository.save(stockToSave);
+        }catch (PersistenceException e){
+            throw new PersistenceException("Error trying to get Stock information");
+        }
+    }
+
+    public Long saveStockToFollow(Quote quote){
         validationBean.notNull("Quote", quote.getQuote());
         StockFollowing stock = stockFollowingRepository.findByQuote(quote.getQuote());
         try{
@@ -114,7 +149,7 @@ public class StockBean {
                         1
                 );
                 earningRepository.save(stockEarning);
-                this.getFollow(stock);
+                this.saveStockToFollow(stock);
                 log.info("Saving new earning : {} - date {}", earning.getSymbol(), stockEarning.getDate().format(DateTimeFormatter.ISO_LOCAL_DATE));
             }else if(stockEarning.getActualRevenue() == 0 && earning.getRevenueActual() != 0){
                 stockEarning.setCurrentEps(earning.getEpsActual());
@@ -134,22 +169,23 @@ public class StockBean {
         }
     }
 
-    public void saveSma(Quote quote, BigDecimal ma, int period, int status){
+    public void saveSma(Quote quote, BigDecimal ma, int period, int status, OffsetDateTime date){
         validationBean.notNull("Quote", quote.getQuote());
         try{
-            StockSma sma = smaRepository.findByQuoteIdAndPeriod(quote.getId(), period);
+            StockSma sma = smaRepository.findByQuoteIdAndPeriodAndDate(quote.getId(), period, date);
             if(sma == null){
                 sma = new StockSma(
                         null,
                         period,
                         quote.getId(),
-                        OffsetDateTime.now(),
+                        date,
                         ma,
                         status
                 );
                 log.info("Saving new sma value to : {} - date {} - value {}", quote.getQuote(), sma.getDate().format(DateTimeFormatter.ISO_LOCAL_DATE), ma);
             }else{
                 sma.setValue(ma);
+                sma.setStatus(status);
             }
             smaRepository.save(sma);
         }catch (PersistenceException e){
@@ -157,22 +193,23 @@ public class StockBean {
         }
     }
 
-    public void saveEma(Quote quote, BigDecimal ma, int period, int status){
+    public void saveEma(Quote quote, BigDecimal ma, int period, int status, OffsetDateTime date){
         validationBean.notNull("Quote", quote.getQuote());
         try{
-            StockEma ema = emaRepository.findByQuoteIdAndPeriod(quote.getId(), period);
+            StockEma ema = emaRepository.findByQuoteIdAndPeriodAndDate(quote.getId(), period, date);
             if(ema == null){
                 ema = new StockEma(
                         null,
                         period,
                         quote.getId(),
-                        OffsetDateTime.now(),
+                        date,
                         ma,
                         status
                 );
                 log.info("Saving new sma value to : {} - date {} - value {}", quote.getQuote(), ema.getDate().format(DateTimeFormatter.ISO_LOCAL_DATE), ma);
             }else{
                 ema.setValue(ma);
+                ema.setStatus(status);
             }
             emaRepository.save(ema);
         }catch (PersistenceException e){
@@ -202,6 +239,7 @@ public class StockBean {
             }else{
                 stock.setClosePrice(candle.getPreviousClosePrice());
                 stock.setHighestPrice(candle.getHighestPrice());
+                stock.setClosePrice(candle.getClosePrice());
                 stock.setLowestPrice(candle.getLowestPrice());
                 stock.setOpenPrice(candle.getOpenPrice());
                 stock.setVolumen(candle.getVolumen());

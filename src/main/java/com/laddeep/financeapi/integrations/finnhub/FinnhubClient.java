@@ -1,8 +1,8 @@
 package com.laddeep.financeapi.integrations.finnhub;
 
 import com.laddeep.financeapi.entity.api.Candle;
-import com.laddeep.financeapi.entity.api.EmaDTO;
-import com.laddeep.financeapi.entity.api.SmaDTO;
+import com.laddeep.financeapi.entity.api.EmasDTO;
+import com.laddeep.financeapi.entity.api.SmasDTO;
 import com.laddeep.financeapi.exceptions.BadRequestException;
 import com.laddeep.financeapi.integrations.finnhub.api.EarningsCalendar;
 import com.laddeep.financeapi.integrations.finnhub.api.StockPriceQuote;
@@ -140,10 +140,10 @@ public class FinnhubClient {
             default:
                 throw new BadRequestException("Incorrect time period to EMA");
         }
-        if(R == EmaDTO.class){
+        if(R == EmasDTO.class){
             log.info("Getting EMA values");
             try{
-                ResponseEntity<EmaDTO> emaValues = this.get(
+                ResponseEntity<EmasDTO> emaValues = this.get(
                         URL + BASE_URL + "/indicator?symbol=" + quote + "&resolution=D"
                                 + "&from=" + from + "&to=" + to + "&indicator=ema&timeperiod=" + timePeriod,
                         R
@@ -154,10 +154,10 @@ public class FinnhubClient {
             }catch (BadRequestException e){
                 throw new BadRequestException(e.getMessage());
             }
-        }else if(R == SmaDTO.class){
+        }else if(R == SmasDTO.class){
             log.info("Getting SMA values");
             try{
-                ResponseEntity<SmaDTO> smaValues = this.get(
+                ResponseEntity<SmasDTO> smaValues = this.get(
                         URL + BASE_URL + "/indicator?symbol=" + quote + "&resolution=D"
                                 + "&from=" + from + "&to=" + to + "&indicator=sma&timeperiod=" + timePeriod,
                         R
