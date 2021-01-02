@@ -97,7 +97,7 @@ public class FinnhubClient {
 
     /**
      * Earnings Calendar
-     * https://finnhub.io/api/v1/calendar/earnings?from=2020-03-12&to=2020-03-15
+     * https://finnhub.io/api/v1/calendar/earnings?from=2020-03-12&to=2020-03-15&international=false
      * @param fromDate
      * @param toDate
      * @return
@@ -107,7 +107,7 @@ public class FinnhubClient {
         try{
             ResponseEntity<EarningsCalendar> earnings = this.get(URL + BASE_URL
                     + "/calendar/earnings?from=" + fromDate.format(DateTimeFormatter.ISO_LOCAL_DATE)
-                    + "&to=" + toDate.format(DateTimeFormatter.ISO_LOCAL_DATE), EarningsCalendar.class);
+                    + "&to=" + toDate.format(DateTimeFormatter.ISO_LOCAL_DATE) + "&international=false" , EarningsCalendar.class);
 
             if(earnings.getBody() != null){
                 return earnings.getBody();

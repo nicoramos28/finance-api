@@ -8,6 +8,7 @@ import com.laddeep.financeapi.service.TelegramMessageService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import java.io.IOException;
 
@@ -46,7 +47,7 @@ public class StockController {
         return null;
     }
 
-    @RequestMapping("/stock_follow/quote{quote}")
+    @RequestMapping(value = "/stock_follow/quote{quote}", method = RequestMethod.POST)
     public Long saveStockToFollow(@PathVariable String quote){
         Quote ticker = quoteBean.get(quote);
         return stockService.saveStockToFollow(ticker);

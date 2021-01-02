@@ -1,18 +1,23 @@
 package com.laddeep.financeapi.service;
 
 import com.laddeep.financeapi.component.QuoteBean;
+import com.laddeep.financeapi.entity.api.EarningDTO;
 import com.laddeep.financeapi.entity.db.Quote;
 import com.laddeep.financeapi.entity.db.StockEma;
 import com.laddeep.financeapi.entity.db.StockPrice;
 import com.laddeep.financeapi.entity.db.StockSma;
 import com.laddeep.financeapi.exceptions.ThreadException;
+import com.laddeep.financeapi.integrations.finnhub.api.Earning;
+import com.laddeep.financeapi.integrations.finnhub.api.EarningsCalendar;
 import com.laddeep.financeapi.repository.*;
 import com.laddeep.financeapi.util.CandleUtil;
+import com.laddeep.financeapi.util.DateUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.time.OffsetDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -37,6 +42,8 @@ public class StockAnalyticsService {
 
     private CandleUtil candleUtil;
 
+    private DateUtil dateUtil;
+
     public StockAnalyticsService(TelegramMessageService messageService,
                                  StockEmaRepository emaRepository,
                                  StockSmaRepository smaRepository,
@@ -45,7 +52,8 @@ public class StockAnalyticsService {
                                  ExchangeHolidaysRepository holidaysRepository,
                                  QuoteRepository quoteRepository,
                                  QuoteBean quoteBean,
-                                 CandleUtil candleUtil) {
+                                 CandleUtil candleUtil,
+                                 DateUtil dateUtil) {
         this.messageService = messageService;
         this.emaRepository = emaRepository;
         this.smaRepository = smaRepository;
@@ -55,6 +63,7 @@ public class StockAnalyticsService {
         this.quoteRepository = quoteRepository;
         this.quoteBean = quoteBean;
         this.candleUtil = candleUtil;
+        this.dateUtil = dateUtil;
     }
 
     /**
@@ -66,7 +75,7 @@ public class StockAnalyticsService {
      * 2 - Two candles same position on their moving averages (notification of signal)
      * 3 - Third candle different position on moving averages (notification of confirmation)
      */
-    public void StockAnalyticsSignalAndConfirmation(String ticker){
+    public void stockAnalyticsSignalAndConfirmation(String ticker){
         log.info("## ## ## ## ## ## Start Signal and Confirmation Analytics ## ## ## ## ## ##");
         Quote quote = quoteBean.get(ticker);
 
@@ -118,5 +127,40 @@ public class StockAnalyticsService {
         log.info("## ## ## ## ## ## End Signal and Confirmation Analytics ## ## ## ## ## ##");
     }
 
+    /**
+     *
+     * Earnings analysis. Earnings that reflect an expected move of 10% or more will be notified.
+     * Earning estimate : earning.epsEstimate
+     * Earning result : earning.epsActual
+     * Earning projection % = (StockPrice*100)/epsEstimate
+     * Required @param earning
+     *
+     */
+    public void earningsAnalyticsService(EarningsCalendar earnings){
+        List<EarningDTO> earningList = new ArrayList<>();
+        earnings.getEarnings().forEach(earning -> {
+            Quote stockBean = quoteBean.get(earning.getSymbol());
+            StockPrice stock = stockPriceRepository.findByQuoteIdAndTime(stockBean.getId(), OffsetDateTime.now());
+            if((stock != null) && (stock.getCurrentPrice().compareTo(BigDecimal.ZERO) !=0)){
+                log.info("NEW Earning coming up to {}, estimate eps : {}", earning.getSymbol(), earning.getEpsEstimate());
+                earningList.add(new EarningDTO(
+                        earning.getEpsActual(),
+                        earning.getEpsEstimate(),
+                        earning.getHour(),
+                        earning.getRevenueActual(),
+                        earning.getRevenueEstimate(),
+                        earning.getSymbol(),
+                        stock.getCurrentPrice()
+                ));
+            }
+        });
+        if(!earningList.isEmpty()){
+            try {
+                messageService.notifyDailyEarning(earningList);
+            } catch (IOException | InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
 }

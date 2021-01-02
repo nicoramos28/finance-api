@@ -1,6 +1,6 @@
 package com.laddeep.financeapi.service;
 
-import com.laddeep.financeapi.entity.api.Candle;
+import com.laddeep.financeapi.entity.api.EarningDTO;
 import com.laddeep.financeapi.entity.api.StockPriceDTO;
 import com.laddeep.financeapi.entity.db.StockEma;
 import com.laddeep.financeapi.entity.db.StockPrice;
@@ -9,9 +9,9 @@ import com.laddeep.financeapi.integrations.telegram.TelegramClient;
 import com.laddeep.financeapi.util.CandleUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.List;
 
 @Slf4j
 @Component
@@ -87,6 +87,19 @@ public class TelegramMessageService {
                 "The last candle " + position + "\n" +
                 "Exponential Moving Averages are " + maStatus + " the price and Simple MovingAverage are " +
                 trend + " the price.\n * ---------- ---------- ---------- * ---------- ---------- ---------- *";
+        telegramClient.sendMessage(message);
+    }
+
+    public void notifyDailyEarning(List<EarningDTO> earnings) throws IOException, InterruptedException {
+        String message = "######### EARNING TO NEXT NYSE SESSION #########";
+        for (EarningDTO earning : earnings) {
+            message += "\n******** " + earning.getSymbol() + " ********\n" +
+                    "---- Current Stock Price : " + earning.getCurrentPrice() + "\n" +
+                    "---- EPS estimate : " + earning.getEpsEstimate() + "\n" +
+                    "---- Revenue Estimate : " + earning.getRevenueEstimate() + "\n" +
+                    "---- Announcement : " + earning.getHour();
+        }
+        message += "\n* ---------- ---------- ---------- * ---------- ---------- ---------- *";
         telegramClient.sendMessage(message);
     }
 }

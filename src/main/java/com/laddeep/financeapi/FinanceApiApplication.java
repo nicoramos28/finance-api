@@ -2,7 +2,8 @@ package com.laddeep.financeapi;
 
 import com.laddeep.financeapi.runner.Monitor;
 import com.laddeep.financeapi.runner.SenderFARunner;
-import com.laddeep.financeapi.runner.TriggerFARunner;
+import com.laddeep.financeapi.runner.StockRunner;
+import com.laddeep.financeapi.service.EarningService;
 import com.laddeep.financeapi.service.StockAnalyticsService;
 import com.laddeep.financeapi.service.StockService;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +22,9 @@ public class FinanceApiApplication {
 	StockService stockService;
 
 	@Autowired
+	EarningService earningService;
+
+	@Autowired
 	StockAnalyticsService analyticsService;
 
 	public static void main(String[] args) {
@@ -29,12 +33,19 @@ public class FinanceApiApplication {
 
 	//@Scheduled(fixedDelay = 900000L)
 	@Scheduled(cron = "0 10/55 * ? * *")
-	public void earningsRunner(){
-		log.info("\n######################################## Start Finance-API Runner ########################################");
+	public void stockRunner(){
+		log.info("\n######################################## Start Finance-API Stock Runner ########################################");
 		Monitor monitor = new Monitor();
 		Thread sender = new Thread(new SenderFARunner(monitor));
-		Thread receive = new Thread(new TriggerFARunner(monitor, stockService, analyticsService));
+		Thread receive = new Thread(new StockRunner(monitor, stockService, analyticsService));
 		sender.start();
 		receive.start();
+	}
+
+
+	@Scheduled(fixedDelay = 9000000L)
+	public void earningRunner(){
+		log.info("\n######################################## Start Finance-API Earning Runner ########################################");
+		earningService.getEarnings();
 	}
 }

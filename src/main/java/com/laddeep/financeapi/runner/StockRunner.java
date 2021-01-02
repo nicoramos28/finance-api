@@ -5,13 +5,12 @@ import com.laddeep.financeapi.service.StockAnalyticsService;
 import com.laddeep.financeapi.service.StockService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-
 import java.io.IOException;
 import java.util.concurrent.ThreadLocalRandom;
 
 @Component
 @Slf4j
-public class TriggerFARunner implements Runnable {
+public class StockRunner implements Runnable {
 
     private Monitor monitor;
 
@@ -19,7 +18,7 @@ public class TriggerFARunner implements Runnable {
 
     private StockAnalyticsService analyticsService;
 
-    public TriggerFARunner(Monitor monitor, StockService stockService, StockAnalyticsService analyticsService) {
+    public StockRunner(Monitor monitor, StockService stockService, StockAnalyticsService analyticsService) {
         this.monitor = monitor;
         this.stockService = stockService;
         this.analyticsService = analyticsService;
@@ -31,7 +30,7 @@ public class TriggerFARunner implements Runnable {
             !"End".equals(stockToProcess); stockToProcess = monitor.receive()){
                 log.info("\n## ## ## ## ## ## ## ## Processing " + stockToProcess + " ## ## ## ## ## ## ## ##\n");
                 stockService.geStockEmaSmaValues(stockToProcess);
-                analyticsService.StockAnalyticsSignalAndConfirmation(stockToProcess);
+                analyticsService.stockAnalyticsSignalAndConfirmation(stockToProcess);
             try{
                     Thread.sleep(ThreadLocalRandom.current().nextInt(4000,7000));
                 } catch (InterruptedException e) {

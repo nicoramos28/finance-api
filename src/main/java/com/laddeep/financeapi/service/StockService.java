@@ -9,8 +9,10 @@ import com.laddeep.financeapi.exceptions.BadRequestException;
 import com.laddeep.financeapi.mapper.StockPriceDTOMapper;
 import com.laddeep.financeapi.integrations.finnhub.FinnhubClient;
 import com.laddeep.financeapi.integrations.finnhub.api.StockPriceQuote;
+import com.laddeep.financeapi.util.DateUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
@@ -28,16 +30,24 @@ public class StockService{
 
     private QuoteBean quoteBean;
 
+    private TelegramMessageService messageService;
+
+    private DateUtil dateUtil;
+
     public StockService(
             StockPriceDTOMapper quoteDtoMapper,
             FinnhubClient finnhubClient,
             StockBean stockBean,
-            QuoteBean quoteBean
+            QuoteBean quoteBean,
+            TelegramMessageService messageService,
+            DateUtil dateUtil
     ) {
         this.stockPriceMapper = quoteDtoMapper;
         this.finnhubClient = finnhubClient;
         this.stockBean = stockBean;
         this.quoteBean = quoteBean;
+        this.messageService = messageService;
+        this.dateUtil = dateUtil;
     }
 
     public StockPriceDTO getStockPriceQuote(Quote quote){
@@ -47,7 +57,12 @@ public class StockService{
                 stockBean.saveStockPrice(quote, response);
                 return stockPriceMapper.map(response);
             }else{
-                throw new BadRequestException("Ticker could not be found");
+                try {
+                    messageService.notifyThreadException("ticker "+ quote.getQuote() +" could not be found");
+                } catch (IOException | InterruptedException e) {
+                    throw new BadRequestException("Could not sent telegram message alarm. Cause : " + "Ticker could not be found.");
+                }
+                return stockPriceMapper.map(response);
             }
         }else{
             throw new BadRequestException("Invalid Request");
@@ -71,10 +86,10 @@ public class StockService{
         int i = 1;
         if(ema7 != null){
             while(i < 4){
-                while(day.getDayOfWeek().name().equals("SATURDAY") || day.getDayOfWeek().name().equals("SUNDAY") || quoteBean.isHolidays(day)){
-                    if((day.getDayOfWeek().name().equals("SATURDAY")) || quoteBean.isHolidays(day)) {
+                while(dateUtil.isWeekend(day) || quoteBean.isHolidays(day)){
+                    if(dateUtil.isSaturday(day) || quoteBean.isHolidays(day)) {
                         day = day.minus(1, ChronoUnit.DAYS);
-                    }else if((day.getDayOfWeek().name().equals("SUNDAY"))){
+                    }else if(dateUtil.isSunday(day)){
                         day = day.minus(2, ChronoUnit.DAYS);
                     }
                 }
@@ -94,11 +109,7 @@ public class StockService{
                 stockToSave.setOpenPrice(e7.getO());
                 stockToSave.setVolumen(e7.getV());
 
-                if((day.format(DateTimeFormatter.ISO_LOCAL_DATE).equals(
-                        OffsetDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE))) &&
-                        !(day.getDayOfWeek().name().equals("SATURDAY")) &&
-                        !(day.getDayOfWeek().name().equals("SUNDAY")) &&
-                        !(quoteBean.isHolidays(day))){
+                if(dateUtil.isToday(day) && !(dateUtil.isWeekend(day)) && !(quoteBean.isHolidays(day))){
                     StockPriceDTO stockDb = this.getStockPriceQuote(quote);
                     currentPrice = stockDb.getCurrentPrice();
                     previousClose = stockDb.getPreviousClosePrice();
@@ -121,11 +132,7 @@ public class StockService{
                 log.info("EMA 7 value : {} to date : {}", e7.getEma(), day.format(DateTimeFormatter.ISO_LOCAL_DATE));
                 log.info("EMA 30 value : {} to date : {}", e30.getEma(), day.format(DateTimeFormatter.ISO_LOCAL_DATE));
                 log.info("SMA 200 value : {} to date : {}", s200.getSma(), day.format(DateTimeFormatter.ISO_LOCAL_DATE));
-                if((day.format(DateTimeFormatter.ISO_LOCAL_DATE).equals(
-                        OffsetDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE))) &&
-                        !(day.getDayOfWeek().name().equals("SATURDAY")) &&
-                        !(day.getDayOfWeek().name().equals("SUNDAY")) &&
-                        !(quoteBean.isHolidays(day))){
+                if((dateUtil.isToday(day)) && !(dateUtil.isWeekend(day)) && !(quoteBean.isHolidays(day))){
                     stockBean.saveEma(quote, e7.getEma(), 7, e7.getEma().compareTo(currentPrice), day);
                     stockBean.saveEma(quote, e30.getEma(), 30, e30.getEma().compareTo(currentPrice), day);
                     stockBean.saveSma(quote, s200.getSma(), 200, s200.getSma().compareTo(currentPrice), day);
