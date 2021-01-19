@@ -13,7 +13,7 @@ public class SenderFARunner implements Runnable{
     String[] watchList = {"CRM","FB","MSFT","BABA","AAPL","BA","NVDA","AMZN","SPY",
                                         "UAL","UBER","VIAC","VZ","WFC","WORK","X","XOM","TME","TSM",
                                         "TWTR","SNAP","SONO","SPCE","SPG","STWD","T","TCOM",
-                                        "TEVA","PAGS","PCG","PFE","PTON","RF","SAVE","SBUX","SLB",
+                                        "PAGS","PCG","PFE","PTON","RF","SAVE","SBUX","SLB",
                                         "MUR","NEM","NG","NIO","NKE","ON","ORCL","OXY","LUV","LYFT",
                                         "LYV","MGM","MPW","MS","MU","INTC","IQ","JBLU","JPM","KHC",
                                         "KMI","KO","LEVI","GM","GOLD","GPS","GRPN","GSX","HAL","HLT",
@@ -30,11 +30,11 @@ public class SenderFARunner implements Runnable{
                                         "OHI","NRZ","CYBR","AXNX","MCD","RH","DHI","TGT","NLOK",
                                         "DLA","FIVN","HD","LOW","VNQ","XLRE","LGIH","KBH","OCC",
                                         "VNCE","HEI","CVGW","EPAC","FDS","ZNGA", "ZM", "M", "PLUG",
-                                        "SQ", "KNDI", "FUBO", "BLNK", "MRVL", "SWN", "NOK", "SPXS",
+                                        "SQ", "KNDI", "BLNK", "MRVL", "SWN", "NOK", "SPXS",
                                         "TZA", "MRO", "SRNE", "NNDM", "F", "TEVA", "INO",
-                                        "GNUS", "ITUB", "ET", "ACB", "NLY", "SNDL"};
+                                        "GNUS", "ITUB", "ET", "ACB", "NLY", "SNDL", "STOR"};
 
-    //from SWN low cost. Exclude for short period in NYSE "MNSO",
+    //from SWN low cost. Exclude for short period in NYSE "MNSO", "FUBO"
     public SenderFARunner(Monitor monitor) {
         this.monitor = monitor;
     }
@@ -44,7 +44,7 @@ public class SenderFARunner implements Runnable{
         for (String stock : watchList) {
             monitor.send(stock);
             try{
-                Thread.sleep(ThreadLocalRandom.current().nextInt(4000,6000));
+                Thread.sleep(ThreadLocalRandom.current().nextInt(3000,5000));
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 log.info("\n\n################  Thread interrupted  ################\n");

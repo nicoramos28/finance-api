@@ -49,7 +49,7 @@ public class TelegramClient {
         request = HttpRequest.newBuilder()
                 .GET()
                 .uri(builder.build("bot" + TOKEN))
-                .timeout(Duration.ofSeconds(5))
+                .timeout(Duration.ofSeconds(10))
                 .build();
 
         HttpResponse<String> response = client

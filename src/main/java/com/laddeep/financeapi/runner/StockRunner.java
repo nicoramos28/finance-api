@@ -32,7 +32,7 @@ public class StockRunner implements Runnable {
                 stockService.geStockEmaSmaValues(stockToProcess);
                 analyticsService.stockAnalyticsSignalAndConfirmation(stockToProcess);
             try{
-                    Thread.sleep(ThreadLocalRandom.current().nextInt(4000,7000));
+                    Thread.sleep(ThreadLocalRandom.current().nextInt(3000,5000));
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                     log.info("\n\n################  Thread interrupted  ################\n");
