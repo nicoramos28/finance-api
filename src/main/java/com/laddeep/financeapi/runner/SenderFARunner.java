@@ -10,7 +10,7 @@ public class SenderFARunner implements Runnable{
 
     private Monitor monitor;
 
-    String[] watchList = {"CRM","FB","MSFT","BABA","AAPL","BA","NVDA","AMZN","SPY",
+    String[] watchList = {"CRM","FB","MSFT","BABA","MELI","AAPL","BA","NVDA","AMZN","SPY",
                                         "UAL","UBER","VIAC","VZ","WFC","WORK","X","XOM","TME","TSM",
                                         "TWTR","SNAP","SONO","SPCE","SPG","STWD","T","TCOM",
                                         "PAGS","PCG","PFE","PTON","RF","SAVE","SBUX","SLB",
@@ -22,7 +22,7 @@ public class SenderFARunner implements Runnable{
                                         "BMY","BOX","BP","BSX","C","CCL","AAL","AMD","APA","ATVI",
                                         "BAC","BBBY","CNTG","QTT","LEN","DL","BLBD","AEY","TTC",
                                         "MLHR","ABM","NAV","SCHL","UXIN","APDN","RFIL","BB","WOR",
-                                        "JBL","SCS","FDX","SAFM","RAD","ACN","CAMP","AIR",
+                                        "JBL","SCS","FDX","SAFM","RAD","ACN","CAMP","AIR","FUBO",
                                         "TC","APOG","MDY","VOO","DIA","QQQ","IWM","VTI","TLT",
                                         "GLD","FXB","IBB","TIP","AGG","IEF","SDY","FXE","OIH","FXY",
                                         "REZ","EFA","FXA","SVXY","XLU","VNQI","KRE","GDX","IRBO",
@@ -34,7 +34,7 @@ public class SenderFARunner implements Runnable{
                                         "TZA", "MRO", "SRNE", "NNDM", "F", "TEVA", "INO",
                                         "GNUS", "ITUB", "ET", "ACB", "NLY", "SNDL", "STOR"};
 
-    //from SWN low cost. Exclude for short period in NYSE "MNSO", "FUBO"
+    //from SWN low cost. Exclude for short period in NYSE "MNSO",
     public SenderFARunner(Monitor monitor) {
         this.monitor = monitor;
     }
