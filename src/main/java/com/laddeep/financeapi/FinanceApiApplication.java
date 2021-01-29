@@ -32,7 +32,7 @@ public class FinanceApiApplication {
 	}
 
 	//@Scheduled(fixedDelay = 900000L)
-	@Scheduled(cron = "0 26/65 * ? * *")
+	@Scheduled(cron = "0 55/65 * ? * *")
 	public void stockRunner(){
 		log.info("\n######################################## Start Finance-API Stock Runner ########################################");
 		Monitor monitor = new Monitor();
@@ -41,7 +41,6 @@ public class FinanceApiApplication {
 		sender.start();
 		receive.start();
 	}
-
 
 	@Scheduled(cron = "0 0 13/24 ? * *")
 	public void earningRunner(){

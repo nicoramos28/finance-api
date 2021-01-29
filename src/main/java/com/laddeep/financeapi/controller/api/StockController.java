@@ -34,8 +34,8 @@ public class StockController {
         this.stockBean = stockBean;
     }
 
-    @RequestMapping("/stock_price/quote{quote}")
-    public StockPriceDTO retrieveStockPriceQuote(@PathVariable String quote){
+    @RequestMapping("/stock_price/{quote}")
+    public StockPriceDTO retrieveStockPrice(@PathVariable String quote){
         try {
             Quote ticker = stockBean.get(quote);
             StockPriceDTO response = stockService.getStockPrice(ticker);
@@ -43,15 +43,27 @@ public class StockController {
             return response;
         } catch (IOException | InterruptedException e) {
             try {
-                telegramService.notifyThreadException("Quote " + quote + " cannot be find");
+                telegramService.notifyThreadException("Quote '" + quote + "' cannot be find");
             } catch (IOException | InterruptedException ioException) {
-                ioException.printStackTrace();
+                log.info("---> xxx The Quote cannot be found and there was a problem send telegram exception xxx <---");
             }
             throw new NotFoundException(e.getMessage());
         }
     }
+/*
+    @RequestMapping("/stock_ma/{quote}")
+    public StockPriceDTO retrieveStockMovingAverageValues(@PathVariable String quote){
+        try{
+            Quote ticker = stockBean.get(quote);
 
-    @RequestMapping(value = "/stock_follow/quote{quote}", method = RequestMethod.POST)
+        }catch (){
+
+        }
+        return null;
+    }
+*/
+
+        @RequestMapping(value = "/stock_follow/quote{quote}", method = RequestMethod.POST)
     public Long saveStockToFollow(@PathVariable String quote){
         Quote ticker = stockBean.get(quote);
         return stockService.saveStockToFollow(ticker);
