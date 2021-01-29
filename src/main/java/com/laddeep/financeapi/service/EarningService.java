@@ -1,6 +1,5 @@
 package com.laddeep.financeapi.service;
 
-import com.laddeep.financeapi.component.QuoteBean;
 import com.laddeep.financeapi.component.StockBean;
 import com.laddeep.financeapi.entity.db.Quote;
 import com.laddeep.financeapi.integrations.finnhub.FinnhubClient;
@@ -16,8 +15,6 @@ import java.time.temporal.ChronoUnit;
 @Service
 public class EarningService {
 
-    private QuoteBean quoteBean;
-
     private StockBean stockBean;
 
     private FinnhubClient finnhubClient;
@@ -30,13 +27,11 @@ public class EarningService {
 
 
     public EarningService(
-            QuoteBean quoteBean,
             StockBean stockBean,
             FinnhubClient finnhubClient,
             StockService stockService,
             StockAnalyticsService analyticsService,
             DateUtil dateUtil) {
-        this.quoteBean = quoteBean;
         this.stockBean = stockBean;
         this.finnhubClient = finnhubClient;
         this.stockService = stockService;
@@ -46,8 +41,8 @@ public class EarningService {
 
     public void getEarnings(){
         OffsetDateTime day = OffsetDateTime.now();
-        while(dateUtil.isWeekend(day) || quoteBean.isHolidays(day)){
-            if(dateUtil.isSaturday(day) || quoteBean.isHolidays(day)) {
+        while(dateUtil.isWeekend(day) || stockBean.isHolidays(day)){
+            if(dateUtil.isSaturday(day) || stockBean.isHolidays(day)) {
                 day = day.minus(1, ChronoUnit.DAYS);
             }else if(dateUtil.isSunday(day)){
                 day = day.minus(2, ChronoUnit.DAYS);
@@ -61,10 +56,10 @@ public class EarningService {
                 e.printStackTrace();
             }
             log.info("Analyzing earning {} ", earning.getSymbol());
-            Quote stock = quoteBean.get(earning.getSymbol());
+            Quote stock = stockBean.get(earning.getSymbol());
             stockBean.saveEarning(earning, stock);
             log.info("Updating earning stock prices");
-            stockService.getStockPriceQuote(stock);
+            stockService.getStockPrice(stock);
         });
         analyticsService.earningsAnalyticsService(earnings);
 

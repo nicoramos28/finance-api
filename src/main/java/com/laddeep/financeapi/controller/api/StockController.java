@@ -1,11 +1,13 @@
 package com.laddeep.financeapi.controller.api;
 
+import com.laddeep.financeapi.component.StockBean;
 import com.laddeep.financeapi.entity.api.StockPriceDTO;
-import com.laddeep.financeapi.component.QuoteBean;
 import com.laddeep.financeapi.entity.db.Quote;
+import com.laddeep.financeapi.exceptions.NotFoundException;
 import com.laddeep.financeapi.service.StockService;
 import com.laddeep.financeapi.service.TelegramMessageService;
 import lombok.extern.slf4j.Slf4j;
+import net.bytebuddy.implementation.bytecode.Throw;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -20,36 +22,38 @@ public class StockController {
 
     private TelegramMessageService telegramService;
 
-    private QuoteBean quoteBean;
+    private StockBean stockBean;
 
     public StockController(
             StockService stockService,
             TelegramMessageService telegramService,
-            QuoteBean quoteBean
+            StockBean stockBean
     ){
         this.stockService = stockService;
         this.telegramService = telegramService;
-        this.quoteBean = quoteBean;
+        this.stockBean = stockBean;
     }
 
     @RequestMapping("/stock_price/quote{quote}")
     public StockPriceDTO retrieveStockPriceQuote(@PathVariable String quote){
         try {
-            Quote ticker = quoteBean.get(quote);
-            StockPriceDTO response = stockService.getStockPriceQuote(ticker);
+            Quote ticker = stockBean.get(quote);
+            StockPriceDTO response = stockService.getStockPrice(ticker);
             telegramService.notifyStockPriceQuote(quote, response);
             return response;
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        } catch (IOException | InterruptedException e) {
+            try {
+                telegramService.notifyThreadException("Quote " + quote + " cannot be find");
+            } catch (IOException | InterruptedException ioException) {
+                ioException.printStackTrace();
+            }
+            throw new NotFoundException(e.getMessage());
         }
-        return null;
     }
 
     @RequestMapping(value = "/stock_follow/quote{quote}", method = RequestMethod.POST)
     public Long saveStockToFollow(@PathVariable String quote){
-        Quote ticker = quoteBean.get(quote);
+        Quote ticker = stockBean.get(quote);
         return stockService.saveStockToFollow(ticker);
     }
 

@@ -1,7 +1,6 @@
 package com.laddeep.financeapi.service;
 
 import com.laddeep.financeapi.entity.api.*;
-import com.laddeep.financeapi.component.QuoteBean;
 import com.laddeep.financeapi.component.StockBean;
 import com.laddeep.financeapi.entity.db.Quote;
 import com.laddeep.financeapi.entity.db.StockPrice;
@@ -28,8 +27,6 @@ public class StockService{
 
     private StockBean stockBean;
 
-    private QuoteBean quoteBean;
-
     private TelegramMessageService messageService;
 
     private DateUtil dateUtil;
@@ -38,19 +35,17 @@ public class StockService{
             StockPriceDTOMapper quoteDtoMapper,
             FinnhubClient finnhubClient,
             StockBean stockBean,
-            QuoteBean quoteBean,
             TelegramMessageService messageService,
             DateUtil dateUtil
     ) {
         this.stockPriceMapper = quoteDtoMapper;
         this.finnhubClient = finnhubClient;
         this.stockBean = stockBean;
-        this.quoteBean = quoteBean;
         this.messageService = messageService;
         this.dateUtil = dateUtil;
     }
 
-    public StockPriceDTO getStockPriceQuote(Quote quote){
+    public StockPriceDTO getStockPrice(Quote quote){
         StockPriceQuote response = this.finnhubClient.getStockPriceQuote(quote.getQuote());
         if(response != null){
             if(response.getC().compareTo(BigDecimal.ZERO) != 0){
@@ -62,7 +57,7 @@ public class StockService{
                 } catch (IOException | InterruptedException e) {
                     throw new BadRequestException("Could not sent telegram message alarm. Cause : " + "Ticker could not be found.");
                 }
-                return stockPriceMapper.map(response);
+                return null;
             }
         }else{
             throw new BadRequestException("Invalid Request");
@@ -74,7 +69,7 @@ public class StockService{
     }
 
     public void geStockEmaSmaValues(String ticker){
-        Quote quote = quoteBean.get(ticker);
+        Quote quote = stockBean.get(ticker);
         //Getting current stock price
         EmasDTO ema7 = this.finnhubClient.getMovingAverage(quote.getQuote(), OffsetDateTime.now(), EmasDTO.class, 7);
         EmasDTO ema30 = this.finnhubClient.getMovingAverage(quote.getQuote(), OffsetDateTime.now(), EmasDTO.class, 30);
@@ -86,8 +81,8 @@ public class StockService{
         int i = 1;
         if(ema7 != null){
             while(i < 4){
-                while(dateUtil.isWeekend(day) || quoteBean.isHolidays(day)){
-                    if(dateUtil.isSaturday(day) || quoteBean.isHolidays(day)) {
+                while(dateUtil.isWeekend(day) || stockBean.isHolidays(day)){
+                    if(dateUtil.isSaturday(day) || stockBean.isHolidays(day)) {
                         day = day.minus(1, ChronoUnit.DAYS);
                     }else if(dateUtil.isSunday(day)){
                         day = day.minus(2, ChronoUnit.DAYS);
@@ -109,8 +104,8 @@ public class StockService{
                 stockToSave.setOpenPrice(e7.getO());
                 stockToSave.setVolumen(e7.getV());
 
-                if(dateUtil.isToday(day) && !(dateUtil.isWeekend(day)) && !(quoteBean.isHolidays(day))){
-                    StockPriceDTO stockDb = this.getStockPriceQuote(quote);
+                if(dateUtil.isToday(day) && !(dateUtil.isWeekend(day)) && !(stockBean.isHolidays(day))){
+                    StockPriceDTO stockDb = this.getStockPrice(quote);
                     currentPrice = stockDb.getCurrentPrice();
                     previousClose = stockDb.getPreviousClosePrice();
                 }else{
@@ -132,7 +127,7 @@ public class StockService{
                 log.info("EMA 7 value : {} to date : {}", e7.getEma(), day.format(DateTimeFormatter.ISO_LOCAL_DATE));
                 log.info("EMA 30 value : {} to date : {}", e30.getEma(), day.format(DateTimeFormatter.ISO_LOCAL_DATE));
                 log.info("SMA 200 value : {} to date : {}", s200.getSma(), day.format(DateTimeFormatter.ISO_LOCAL_DATE));
-                if((dateUtil.isToday(day)) && !(dateUtil.isWeekend(day)) && !(quoteBean.isHolidays(day))){
+                if((dateUtil.isToday(day)) && !(dateUtil.isWeekend(day)) && !(stockBean.isHolidays(day))){
                     stockBean.saveEma(quote, e7.getEma(), 7, e7.getEma().compareTo(currentPrice), day);
                     stockBean.saveEma(quote, e30.getEma(), 30, e30.getEma().compareTo(currentPrice), day);
                     stockBean.saveSma(quote, s200.getSma(), 200, s200.getSma().compareTo(currentPrice), day);

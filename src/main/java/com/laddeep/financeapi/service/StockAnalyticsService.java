@@ -1,13 +1,12 @@
 package com.laddeep.financeapi.service;
 
-import com.laddeep.financeapi.component.QuoteBean;
+import com.laddeep.financeapi.component.StockBean;
 import com.laddeep.financeapi.entity.api.EarningDTO;
 import com.laddeep.financeapi.entity.db.Quote;
 import com.laddeep.financeapi.entity.db.StockEma;
 import com.laddeep.financeapi.entity.db.StockPrice;
 import com.laddeep.financeapi.entity.db.StockSma;
 import com.laddeep.financeapi.exceptions.ThreadException;
-import com.laddeep.financeapi.integrations.finnhub.api.Earning;
 import com.laddeep.financeapi.integrations.finnhub.api.EarningsCalendar;
 import com.laddeep.financeapi.repository.*;
 import com.laddeep.financeapi.util.CandleUtil;
@@ -38,7 +37,7 @@ public class StockAnalyticsService {
 
     private QuoteRepository quoteRepository;
 
-    private QuoteBean quoteBean;
+    private StockBean stockBean;
 
     private CandleUtil candleUtil;
 
@@ -51,7 +50,7 @@ public class StockAnalyticsService {
                                  StockPriceRepository stockPriceRepository,
                                  ExchangeHolidaysRepository holidaysRepository,
                                  QuoteRepository quoteRepository,
-                                 QuoteBean quoteBean,
+                                 StockBean stockBean,
                                  CandleUtil candleUtil,
                                  DateUtil dateUtil) {
         this.messageService = messageService;
@@ -61,7 +60,7 @@ public class StockAnalyticsService {
         this.stockPriceRepository = stockPriceRepository;
         this.holidaysRepository = holidaysRepository;
         this.quoteRepository = quoteRepository;
-        this.quoteBean = quoteBean;
+        this.stockBean = stockBean;
         this.candleUtil = candleUtil;
         this.dateUtil = dateUtil;
     }
@@ -77,7 +76,7 @@ public class StockAnalyticsService {
      */
     public void stockAnalyticsSignalAndConfirmation(String ticker){
         log.info("## ## ## ## ## ## Start Signal and Confirmation Analytics ## ## ## ## ## ##");
-        Quote quote = quoteBean.get(ticker);
+        Quote quote = this.stockBean.get(ticker);
 
         List<StockPrice> candles = stockPriceRepository.findLastCandles(quote.getId());
         List<StockEma> emas7 = emaRepository.findLastEmaValues(quote.getId(), 7);
@@ -139,8 +138,8 @@ public class StockAnalyticsService {
     public void earningsAnalyticsService(EarningsCalendar earnings){
         List<EarningDTO> earningList = new ArrayList<>();
         earnings.getEarnings().forEach(earning -> {
-            Quote stockBean = quoteBean.get(earning.getSymbol());
-            StockPrice stock = stockPriceRepository.findByQuoteIdAndTime(stockBean.getId(), OffsetDateTime.now());
+            Quote stockData = this.stockBean.get(earning.getSymbol());
+            StockPrice stock = stockPriceRepository.findByQuoteIdAndTime(stockData.getId(), OffsetDateTime.now());
             if((stock != null) && (stock.getCurrentPrice().compareTo(BigDecimal.ZERO) !=0)){
                 log.info("NEW Earning coming up to {}, estimate eps : {}", earning.getSymbol(), earning.getEpsEstimate());
                 earningList.add(new EarningDTO(

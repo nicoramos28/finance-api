@@ -27,13 +27,19 @@ public class StockBean {
 
     private StockSmaRepository smaRepository;
 
+    private QuoteRepository quoteRepository;
+
+    private ExchangeHolidaysRepository holidaysRepository;
+
     public StockBean(
             StockPriceRepository stockPriceRepository,
             ValidationBean validationBean,
             StockFollowingRepository stockFollowingRepository,
             StockEarningRepository earningRepository,
             StockEmaRepository emaRepository,
-            StockSmaRepository smaRepository
+            StockSmaRepository smaRepository,
+            QuoteRepository quoteRepository,
+            ExchangeHolidaysRepository holidaysRepository
     ) {
         this.stockPriceRepository = stockPriceRepository;
         this.validationBean = validationBean;
@@ -41,6 +47,35 @@ public class StockBean {
         this.earningRepository = earningRepository;
         this.emaRepository = emaRepository;
         this.smaRepository = smaRepository;
+        this.quoteRepository = quoteRepository;
+        this.holidaysRepository = holidaysRepository;
+    }
+
+    /**
+     * Find in saved information the current bean. To make the correct search, a ticker is needed
+     * @param ticker
+     * @return
+     */
+    public Quote get(String ticker){
+        Quote quote;
+        validationBean.notNull("Quote", ticker);
+        try{
+            quote = quoteRepository.findByQuote(ticker);
+            if(quote == null){
+                quote = new Quote(null,ticker,OffsetDateTime.now());
+            }else{
+                quote.setLastUpdate(OffsetDateTime.now());
+            }
+            quoteRepository.save(quote);
+        }catch (PersistenceException e){
+            throw new PersistenceException("Error trying to get saved stock information");
+        }
+        return quote;
+    }
+
+    public Boolean isHolidays(OffsetDateTime today){
+        StockExchangeHoliday holiday = holidaysRepository.findByDate(today.format(DateTimeFormatter.ISO_LOCAL_DATE));
+        return holiday != null;
     }
 
     public void saveStockPrice(Quote quote, StockPriceQuote stockPrices) {

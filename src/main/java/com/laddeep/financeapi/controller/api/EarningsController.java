@@ -1,11 +1,9 @@
 package com.laddeep.financeapi.controller.api;
 
-import com.laddeep.financeapi.component.QuoteBean;
+import com.laddeep.financeapi.component.StockBean;
 import com.laddeep.financeapi.service.EarningService;
 import com.laddeep.financeapi.service.TelegramMessageService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
@@ -16,16 +14,16 @@ public class EarningsController {
 
     private TelegramMessageService telegramService;
 
-    private QuoteBean quoteBean;
+    private StockBean stockBean;
 
 
     public EarningsController(
             EarningService earningService,
             TelegramMessageService telegramService,
-            QuoteBean quoteBean) {
+            StockBean stockBean) {
         this.earningService = earningService;
         this.telegramService = telegramService;
-        this.quoteBean = quoteBean;
+        this.stockBean = stockBean;
     }
     /* EVALUAR SI ES UTIL TENER ESTE ENDPOINT
     @RequestMapping("/earning/quote{quote}")
