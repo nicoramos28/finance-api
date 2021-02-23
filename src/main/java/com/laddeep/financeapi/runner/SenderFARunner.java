@@ -33,15 +33,32 @@ public class SenderFARunner implements Runnable{
                                         "SQ", "KNDI", "BLNK", "MRVL", "SWN", "NOK", "SPXS",
                                         "TZA", "MRO", "SRNE", "NNDM", "F", "TEVA", "INO",
                                         "GNUS", "ITUB", "ET", "ACB", "NLY", "SNDL", "STOR"};
-
     //from SWN low cost. Exclude for short period in NYSE "MNSO",
+
+
+    String[] watchList2 = {"ABM","ABT","ACM","ADI","AGCO","ALB","AMAT","AMED","AMG","ARW","ATKR",
+            "ATR","AVT","AZPN","BC","BGFV","BIG","BRKS","BWA","CAH","CALX","CBT",
+            "CCK","CDK","CDNS","CE","CHE","COLM","COO","COUP","CRM","CRWD","D",
+            "DD","DGX","DT","EBAY","EMN","ENR","ENTG","EPAM","ETN","FIVN","FN",
+            "FOXF","FTNT","FTV","GDOT","GLW","GRMN","HEAR","HI","HIBB","HOLX","HRC",
+            "HUBS","HZO","IDXX","INTC","INTU","IPAR","IRBT","JBL","KEYS","KFRC",
+            "KLAC","KLIC","KNX","KR","KTB","LAMR","LB","LH","LMAT","LRCX","LSTR","MASI",
+            "MATX","MHK","MKSI","MTD","MTOR","MU","NFLX","OMCL","ONTO","PANW",
+            "PFPT","PH","PII","PKI","PLT","PLXS","PNR","PTC","QCOM","QRVO","RGEN",
+            "SCVL","SGH","SLAB","SLGN","SNBR","SNX","SSTK","STMP","SWKS","SYKE","TDY",
+            "TEL","TENB","TER","TNC","TPX","TXN","USNA","VSTO","WHR","WST","XPO",
+            "ZM","ZS","GTLS" ,"CTRN","RS" ,"MTRN","AMAT","COLD","GLOB"
+    };
+    //remove from list "JWA","NVMI", "SAM"
+
+
     public SenderFARunner(Monitor monitor) {
         this.monitor = monitor;
     }
 
     @Override
     public void run() {
-        for (String stock : watchList) {
+        for (String stock : watchList2) {
             monitor.send(stock);
             try{
                 Thread.sleep(ThreadLocalRandom.current().nextInt(3000,5000));

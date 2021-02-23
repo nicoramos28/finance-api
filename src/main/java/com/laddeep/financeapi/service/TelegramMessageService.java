@@ -102,4 +102,12 @@ public class TelegramMessageService {
         message += "\n* ---------- ---------- ---------- * ---------- ---------- ---------- *";
         telegramClient.sendMessage(message);
     }
+
+    public void notifyTwoCandles(List<String> tickers) throws IOException, InterruptedException {
+        final String[] message = {"---- Notification of two candles \n"};
+        tickers.forEach(ticker->{
+            message[0] += " " + ticker + "\n";
+                });
+        telegramClient.sendMessage(message[0]);
+    }
 }

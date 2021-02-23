@@ -43,6 +43,8 @@ public class StockAnalyticsService {
 
     private DateUtil dateUtil;
 
+    private List<String> tickerList = new ArrayList<>();
+
     public StockAnalyticsService(TelegramMessageService messageService,
                                  StockEmaRepository emaRepository,
                                  StockSmaRepository smaRepository,
@@ -76,6 +78,8 @@ public class StockAnalyticsService {
      */
     public void stockAnalyticsSignalAndConfirmation(String ticker){
         log.info("## ## ## ## ## ## Start Signal and Confirmation Analytics ## ## ## ## ## ##");
+        Boolean lastTicker = ticker.equals("STOR");
+
         Quote quote = this.stockBean.get(ticker);
 
         List<StockPrice> candles = stockPriceRepository.findLastCandles(quote.getId());
@@ -105,6 +109,15 @@ public class StockAnalyticsService {
         int c3Type = candleUtil.getCandleType(candle3);
 
         if(c1Type == c2Type){
+            if(!lastTicker){
+                tickerList.add(ticker);
+            }else{
+                try {
+                    messageService.notifyTwoCandles(tickerList);
+                } catch (IOException | InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
             if((ema7_1.getStatus() == ema30_1.getStatus()) && (ema7_2.getStatus() == ema30_2.getStatus()) && (ema7_1.getStatus() == ema7_2.getStatus()) && (ema30_1.getStatus() == ema30_2.getStatus())){
                 if(ema7_1.getStatus() != ema7_3.getStatus()){
                     if(!(candleUtil.findCandlesGap(candle1, candle2)) && !(candleUtil.findCandlesGap(candle2, candle3))){

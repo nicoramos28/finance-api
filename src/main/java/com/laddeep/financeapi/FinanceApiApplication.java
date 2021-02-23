@@ -34,7 +34,7 @@ public class FinanceApiApplication extends SpringBootServletInitializer {
 	}
 
 	//@Scheduled(fixedDelay = 900000L)
-	@Scheduled(cron = "0 55/65 * ? * *")
+	@Scheduled(cron = "0 06/65 * ? * *")
 	public void stockRunner(){
 		log.info("\n######################################## Start Finance-API Stock Runner ########################################");
 		Monitor monitor = new Monitor();
@@ -43,13 +43,13 @@ public class FinanceApiApplication extends SpringBootServletInitializer {
 		sender.start();
 		receive.start();
 	}
-
-	@Scheduled(cron = "0 0 13/24 ? * *")
+/*
+	@Scheduled(cron = "0 0 45/24 ? * *")
 	public void earningRunner(){
 		log.info("\n######################################## Start Finance-API Earning Runner ########################################");
 		earningService.getEarnings();
 	}
-
+*/
 	@Override
 	protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
 		return application.sources(FinanceApiApplication.class);
