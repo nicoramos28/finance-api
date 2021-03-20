@@ -58,7 +58,7 @@ public class SenderFARunner implements Runnable{
 
     @Override
     public void run() {
-        for (String stock : watchList2) {
+        for (String stock : watchList) {
             monitor.send(stock);
             try{
                 Thread.sleep(ThreadLocalRandom.current().nextInt(3000,5000));

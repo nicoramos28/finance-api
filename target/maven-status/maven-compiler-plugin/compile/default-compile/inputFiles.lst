@@ -1,6 +1,5 @@
 /Users/nicolasramos/Documents/GitHub/finance-api/src/main/java/com/laddeep/financeapi/entity/db/StockEma.java
 /Users/nicolasramos/Documents/GitHub/finance-api/src/main/java/com/laddeep/financeapi/util/CandleUtil.java
-/Users/nicolasramos/Documents/GitHub/finance-api/src/main/java/com/laddeep/financeapi/ServletInitializer.java
 /Users/nicolasramos/Documents/GitHub/finance-api/src/main/java/com/laddeep/financeapi/repository/QuoteRepository.java
 /Users/nicolasramos/Documents/GitHub/finance-api/src/main/java/com/laddeep/financeapi/runner/SenderFARunner.java
 /Users/nicolasramos/Documents/GitHub/finance-api/src/main/java/com/laddeep/financeapi/exceptions/AppException.java
