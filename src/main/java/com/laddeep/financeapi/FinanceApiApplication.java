@@ -34,6 +34,7 @@ public class FinanceApiApplication extends SpringBootServletInitializer {
 	}
 
 	//@Scheduled(fixedDelay = 900000L)
+	/*
 	@Scheduled(cron = "0 41/65 * ? * *")
 	public void stockRunner(){
 		log.info("\n######################################## Start Finance-API Stock Runner ########################################");

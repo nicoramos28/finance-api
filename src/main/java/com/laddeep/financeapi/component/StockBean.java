@@ -5,6 +5,7 @@ import com.laddeep.financeapi.exceptions.PersistenceException;
 import com.laddeep.financeapi.integrations.finnhub.api.Earning;
 import com.laddeep.financeapi.integrations.finnhub.api.StockPriceQuote;
 import com.laddeep.financeapi.repository.*;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import java.math.BigDecimal;
@@ -285,4 +286,9 @@ public class StockBean {
             throw new PersistenceException("Error trying to get, update or insert new Candle information");
         }
     }
+
+    public List<Quote> getAllQuotes(){
+        return quoteRepository.findAll();
+    }
+
 }

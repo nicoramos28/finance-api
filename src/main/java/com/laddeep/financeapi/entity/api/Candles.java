@@ -5,7 +5,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 @Data
-public class Candle {
+public class Candles {
 
     private List<BigDecimal> c;
 
@@ -17,9 +17,9 @@ public class Candle {
 
     private List<Double> v;
 
-    public Candle(){}
+    public Candles(){}
 
-    public Candle(List<BigDecimal> c, List<BigDecimal> h, List<BigDecimal> l, List<BigDecimal> o, List<Double> v) {
+    public Candles(List<BigDecimal> c, List<BigDecimal> h, List<BigDecimal> l, List<BigDecimal> o, List<Double> v) {
         this.c = c;
         this.h = h;
         this.l = l;

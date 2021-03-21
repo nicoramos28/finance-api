@@ -6,8 +6,8 @@ import com.laddeep.financeapi.entity.db.Quote;
 import com.laddeep.financeapi.exceptions.NotFoundException;
 import com.laddeep.financeapi.service.StockService;
 import com.laddeep.financeapi.service.TelegramMessageService;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
-import net.bytebuddy.implementation.bytecode.Throw;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -50,23 +50,20 @@ public class StockController {
             throw new NotFoundException(e.getMessage());
         }
     }
-/*
-    @RequestMapping("/stock_ma/{quote}")
-    public StockPriceDTO retrieveStockMovingAverageValues(@PathVariable String quote){
-        try{
-            Quote ticker = stockBean.get(quote);
 
-        }catch (){
-
-        }
-        return null;
-    }
-*/
-
-        @RequestMapping(value = "/stock_follow/quote{quote}", method = RequestMethod.POST)
+    @RequestMapping(value = "/stock_follow/quote{quote}", method = RequestMethod.POST)
     public Long saveStockToFollow(@PathVariable String quote){
         Quote ticker = stockBean.get(quote);
         return stockService.saveStockToFollow(ticker);
     }
+
+    @RequestMapping(value = "/two_candles", method = RequestMethod.POST)
+    public void runTwoCandlesStrategyQuotes(){
+        Thread twoCandlesAnalyticsThread = new Thread(()->{
+            stockService.getQuotesInTwoCandlesStrategy();
+        });
+        twoCandlesAnalyticsThread.start();
+    }
+
 
 }

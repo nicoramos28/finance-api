@@ -1,6 +1,6 @@
 package com.laddeep.financeapi.integrations.finnhub;
 
-import com.laddeep.financeapi.entity.api.Candle;
+import com.laddeep.financeapi.entity.api.Candles;
 import com.laddeep.financeapi.entity.api.EmasDTO;
 import com.laddeep.financeapi.entity.api.SmasDTO;
 import com.laddeep.financeapi.exceptions.BadRequestException;
@@ -79,12 +79,12 @@ public class FinnhubClient {
      * @param toDate
      * @return
      */
-    public Candle StockWeekCandles(String quote, OffsetDateTime toDate){
+    public Candles getWeekCandles(String quote, OffsetDateTime toDate){
         log.info("Getting Candles of : {} - until : {}", quote, toDate.format(DateTimeFormatter.ISO_LOCAL_DATE));
         try{
-            ResponseEntity<Candle> candles = this.get(URL + BASE_URL
+            ResponseEntity<Candles> candles = this.get(URL + BASE_URL
                     + "/stock/candle?symbol=" + quote + "&resolution=D&from=" + toDate.minus(7, ChronoUnit.DAYS).toEpochSecond()
-                    + "&to=" + toDate.toEpochSecond(), Candle.class);
+                    + "&to=" + toDate.toEpochSecond(), Candles.class);
 
             if(candles.getBody() != null){
                 return candles.getBody();
@@ -171,5 +171,7 @@ public class FinnhubClient {
         }
         return null;
     }
+
+
 }
 

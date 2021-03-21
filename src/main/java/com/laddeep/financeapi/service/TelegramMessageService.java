@@ -2,6 +2,7 @@ package com.laddeep.financeapi.service;
 
 import com.laddeep.financeapi.entity.api.EarningDTO;
 import com.laddeep.financeapi.entity.api.StockPriceDTO;
+import com.laddeep.financeapi.entity.db.Quote;
 import com.laddeep.financeapi.entity.db.StockEma;
 import com.laddeep.financeapi.entity.db.StockPrice;
 import com.laddeep.financeapi.entity.db.StockSma;
@@ -104,10 +105,18 @@ public class TelegramMessageService {
     }
 
     public void notifyTwoCandles(List<String> tickers) throws IOException, InterruptedException {
-        final String[] message = {"---- Notification of two candles \n"};
-        tickers.forEach(ticker->{
-            message[0] += " " + ticker + "\n";
-                });
-        telegramClient.sendMessage(message[0]);
+        String message = "---- Notification of two candles \n";
+        for(int i = 0; i< tickers.size(); i++){
+            message += " " + tickers.get(i);
+            if(i% 4 == 0 && i != 0){
+                message += "\n";
+            }
+        }
+        telegramClient.sendMessage(message);
+    }
+
+    public void notifyQuote(Quote quote, String direction) throws IOException, InterruptedException {
+        String message = "---- " + quote.getQuote() + " is presenting two " + direction + " candles in the same direction ---";
+        telegramClient.sendMessage(message);
     }
 }
