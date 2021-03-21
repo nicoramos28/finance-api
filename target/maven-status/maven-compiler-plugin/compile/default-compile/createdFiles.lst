@@ -27,6 +27,7 @@ com/laddeep/financeapi/exceptions/ThreadException.class
 com/laddeep/financeapi/entity/db/StockEma.class
 com/laddeep/financeapi/integrations/RestClient.class
 com/laddeep/financeapi/entity/db/Quote.class
+com/laddeep/financeapi/entity/api/Candles.class
 com/laddeep/financeapi/repository/StockSmaRepository.class
 com/laddeep/financeapi/mapper/StockPriceDTOMapper.class
 com/laddeep/financeapi/repository/StockFollowingRepository.class
@@ -35,7 +36,6 @@ com/laddeep/financeapi/entity/db/StockExchangeHoliday.class
 com/laddeep/financeapi/entity/db/StockPrice.class
 com/laddeep/financeapi/entity/api/EmasDTO.class
 com/laddeep/financeapi/repository/QuoteRepository.class
-com/laddeep/financeapi/entity/api/Candle.class
 com/laddeep/financeapi/entity/api/SmaDTO.class
 com/laddeep/financeapi/mapper/Mapper.class
 com/laddeep/financeapi/controller/api/EarningsController.class

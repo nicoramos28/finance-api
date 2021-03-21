@@ -9,6 +9,9 @@ import com.laddeep.financeapi.mapper.StockPriceDTOMapper;
 import com.laddeep.financeapi.integrations.finnhub.FinnhubClient;
 import com.laddeep.financeapi.integrations.finnhub.api.StockPriceQuote;
 import com.laddeep.financeapi.util.DateUtil;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import java.io.IOException;
@@ -31,6 +34,8 @@ public class StockService{
 
     private DateUtil dateUtil;
 
+    private Boolean hasResult;
+
     public StockService(
             StockPriceDTOMapper quoteDtoMapper,
             FinnhubClient finnhubClient,
@@ -43,6 +48,7 @@ public class StockService{
         this.stockBean = stockBean;
         this.messageService = messageService;
         this.dateUtil = dateUtil;
+        this.hasResult = false;
     }
 
     public StockPriceDTO getStockPrice(Quote quote){
@@ -143,5 +149,68 @@ public class StockService{
             throw new BadRequestException("Invalid EMAs values");
         }
     }
+
+
+    public void getQuotesInTwoCandlesStrategy(){
+        log.info("Getting list of all quotes in DB and all quotes that fulfill the strategy of two candles");
+        List<Quote> quotes = stockBean.getAllQuotes();
+        List<String> performTwoCandles = new ArrayList<>();
+
+        quotes.forEach(quote->{
+            /* Get quote prices */
+            Candles candles = finnhubClient.getWeekCandles(quote.getQuote(),OffsetDateTime.now());
+            List<BigDecimal> c = candles.getC();
+            List<BigDecimal> o = candles.getO();
+            if(c == null || c.isEmpty()){
+                log.error("Could not find candles to stock : {}, please check if the ticker is correct", quote.getQuote());
+            }else{
+
+                /*
+                 *  -1 less than
+                 *  0 equal to
+                 *  or 1 greater
+                 */
+                int firstCandlePosition = c.get(c.size() - 1).compareTo(o.get(c.size() - 1));
+                int secondCandlePosition = c.get(c.size() - 2).compareTo(o.get(c.size() - 2));
+
+                if(firstCandlePosition != 0 && secondCandlePosition != 0){
+                    if(firstCandlePosition == secondCandlePosition && firstCandlePosition > 0){
+                        if(c.get(c.size() - 1).compareTo(c.get(c.size() - 2)) > 0){
+                            log.info("Quote : {} - ID : {}, is presenting two positive candles in the same direction", quote.getQuote(), quote.getId());
+                            /*try {
+                                messageService.notifyQuote(quote, "positive");
+                            } catch (IOException | InterruptedException e) {
+                                e.printStackTrace();
+                            }*/
+                            performTwoCandles.add(quote.getQuote());
+                        }
+                    }else if (firstCandlePosition == secondCandlePosition && firstCandlePosition < 0){
+                        if(c.get(c.size() - 1).compareTo(c.get(c.size() - 2)) < 0){
+                            log.info("Quote : {} - ID : {}, is presenting two negative candles in the same direction", quote.getQuote(), quote.getId());
+                            /*try {
+                                messageService.notifyQuote(quote, "negative");
+                            } catch (IOException | InterruptedException e) {
+                                e.printStackTrace();
+                            }*/
+                            performTwoCandles.add(quote.getQuote());
+                        }
+                    }
+                }
+
+                try {
+                    TimeUnit.SECONDS.sleep(3);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        try {
+            messageService.notifyTwoCandles(performTwoCandles);
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
 
 }

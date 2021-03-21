@@ -19,10 +19,10 @@
 /Users/nicolasramos/Documents/GitHub/finance-api/src/main/java/com/laddeep/financeapi/integrations/finnhub/api/StockPriceQuote.java
 /Users/nicolasramos/Documents/GitHub/finance-api/src/main/java/com/laddeep/financeapi/mapper/StockPriceDTOMapper.java
 /Users/nicolasramos/Documents/GitHub/finance-api/src/main/java/com/laddeep/financeapi/runner/StockRunner.java
+/Users/nicolasramos/Documents/GitHub/finance-api/src/main/java/com/laddeep/financeapi/entity/api/Candles.java
 /Users/nicolasramos/Documents/GitHub/finance-api/src/main/java/com/laddeep/financeapi/exceptions/ThreadException.java
 /Users/nicolasramos/Documents/GitHub/finance-api/src/main/java/com/laddeep/financeapi/entity/api/QuoteDTO.java
 /Users/nicolasramos/Documents/GitHub/finance-api/src/main/java/com/laddeep/financeapi/service/StockService.java
-/Users/nicolasramos/Documents/GitHub/finance-api/src/main/java/com/laddeep/financeapi/entity/api/Candle.java
 /Users/nicolasramos/Documents/GitHub/finance-api/src/main/java/com/laddeep/financeapi/exceptions/PersistenceException.java
 /Users/nicolasramos/Documents/GitHub/finance-api/src/main/java/com/laddeep/financeapi/mapper/Mapper.java
 /Users/nicolasramos/Documents/GitHub/finance-api/src/main/java/com/laddeep/financeapi/entity/db/Quote.java
