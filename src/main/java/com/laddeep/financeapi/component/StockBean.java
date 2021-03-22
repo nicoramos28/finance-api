@@ -287,8 +287,4 @@ public class StockBean {
         }
     }
 
-    public List<Quote> getAllQuotes(){
-        return quoteRepository.findAll();
-    }
-
 }

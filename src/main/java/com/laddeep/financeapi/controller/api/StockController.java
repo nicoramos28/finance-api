@@ -6,7 +6,6 @@ import com.laddeep.financeapi.entity.db.Quote;
 import com.laddeep.financeapi.exceptions.NotFoundException;
 import com.laddeep.financeapi.service.StockService;
 import com.laddeep.financeapi.service.TelegramMessageService;
-import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;

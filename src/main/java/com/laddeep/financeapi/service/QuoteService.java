@@ -5,8 +5,8 @@ import com.laddeep.financeapi.entity.db.Quote;
 import com.laddeep.financeapi.repository.QuoteRepository;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
-import org.jvnet.hk2.annotations.Service;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service

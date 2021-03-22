@@ -13,16 +13,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
-import org.jvnet.hk2.annotations.Service;
-import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import org.springframework.stereotype.Service;
 
-@Service
+
 @Slf4j
+@Service
 public class StockService{
 
     private QuoteService quoteService;
@@ -156,7 +156,7 @@ public class StockService{
 
     public void getQuotesInTwoCandlesStrategy(){
         log.info("Getting list of all quotes in DB and all quotes that fulfill the strategy of two candles");
-        List<Quote> quotes = stockBean.getAllQuotes();
+        List<Quote> quotes = quoteService.getAllQuotes();
         List<String> performTwoCandles = new ArrayList<>();
 
         quotes.forEach(quote->{
@@ -186,21 +186,11 @@ public class StockService{
                     if(firstCandlePosition == secondCandlePosition && firstCandlePosition > 0){
                         if(c.get(c.size() - 1).compareTo(c.get(c.size() - 2)) > 0){
                             log.info("Quote : {} - ID : {}, is presenting two positive candles in the same direction", quote.getQuote(), quote.getId());
-                            /*try {
-                                messageService.notifyQuote(quote, "positive");
-                            } catch (IOException | InterruptedException e) {
-                                e.printStackTrace();
-                            }*/
                             performTwoCandles.add(quote.getQuote());
                         }
                     }else if (firstCandlePosition == secondCandlePosition && firstCandlePosition < 0){
                         if(c.get(c.size() - 1).compareTo(c.get(c.size() - 2)) < 0){
                             log.info("Quote : {} - ID : {}, is presenting two negative candles in the same direction", quote.getQuote(), quote.getId());
-                            /*try {
-                                messageService.notifyQuote(quote, "negative");
-                            } catch (IOException | InterruptedException e) {
-                                e.printStackTrace();
-                            }*/
                             performTwoCandles.add(quote.getQuote());
                         }
                     }
