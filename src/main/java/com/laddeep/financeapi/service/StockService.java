@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
+import org.jvnet.hk2.annotations.Service;
 import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -20,9 +21,11 @@ import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 
-@Component
+@Service
 @Slf4j
 public class StockService{
+
+    private QuoteService quoteService;
 
     private StockPriceDTOMapper stockPriceMapper;
 
@@ -34,21 +37,21 @@ public class StockService{
 
     private DateUtil dateUtil;
 
-    private Boolean hasResult;
 
     public StockService(
+            QuoteService quoteService,
             StockPriceDTOMapper quoteDtoMapper,
             FinnhubClient finnhubClient,
             StockBean stockBean,
             TelegramMessageService messageService,
             DateUtil dateUtil
     ) {
+        this.quoteService = quoteService;
         this.stockPriceMapper = quoteDtoMapper;
         this.finnhubClient = finnhubClient;
         this.stockBean = stockBean;
         this.messageService = messageService;
         this.dateUtil = dateUtil;
-        this.hasResult = false;
     }
 
     public StockPriceDTO getStockPrice(Quote quote){
@@ -163,6 +166,12 @@ public class StockService{
             List<BigDecimal> o = candles.getO();
             if(c == null || c.isEmpty()){
                 log.error("Could not find candles to stock : {}, please check if the ticker is correct", quote.getQuote());
+                try {
+                    messageService.notifyThreadException("Could not found candles of " + quote.getQuote());
+                } catch (IOException | InterruptedException e) {
+                    e.printStackTrace();
+                }
+
             }else{
 
                 /*
@@ -212,5 +221,9 @@ public class StockService{
         }
     }
 
+
+    public void getCrossoverAveragesStrategy(){
+
+    }
 
 }

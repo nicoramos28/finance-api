@@ -6,10 +6,11 @@ import com.laddeep.financeapi.service.TelegramMessageService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RestController;
 
-@Slf4j
-@RestController
+//@Slf4j
+//@RestController
 public class EarningsController {
 
+    /*
     private EarningService earningService;
 
     private TelegramMessageService telegramService;

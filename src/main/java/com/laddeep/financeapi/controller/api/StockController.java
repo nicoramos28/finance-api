@@ -65,5 +65,12 @@ public class StockController {
         twoCandlesAnalyticsThread.start();
     }
 
+    @RequestMapping(value = "/crossover_averages", method = RequestMethod.POST)
+    public void runCrossoverAveragesStrateg(){
+        Thread crossoverQuotesStrategy = new Thread(()->{
+            stockService.getCrossoverAveragesStrategy();
+        });
+        crossoverQuotesStrategy.start();
+    }
 
 }

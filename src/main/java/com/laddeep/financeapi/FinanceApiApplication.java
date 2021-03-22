@@ -20,14 +20,14 @@ import org.springframework.scheduling.annotation.Scheduled;
 @Slf4j
 public class FinanceApiApplication extends SpringBootServletInitializer {
 
-	@Autowired
-	StockService stockService;
+	//@Autowired
+	//StockService stockService;
 
-	@Autowired
-	EarningService earningService;
+	//@Autowired
+	//EarningService earningService;
 
-	@Autowired
-	StockAnalyticsService analyticsService;
+	//@Autowired
+	//StockAnalyticsService analyticsService;
 
 	public static void main(String[] args) {
 		SpringApplication.run(FinanceApiApplication.class, args);

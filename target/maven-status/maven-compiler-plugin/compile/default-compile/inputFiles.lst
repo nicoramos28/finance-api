@@ -14,6 +14,7 @@
 /Users/nicolasramos/Documents/GitHub/finance-api/src/main/java/com/laddeep/financeapi/controller/api/EarningsController.java
 /Users/nicolasramos/Documents/GitHub/finance-api/src/main/java/com/laddeep/financeapi/integrations/RestClient.java
 /Users/nicolasramos/Documents/GitHub/finance-api/src/main/java/com/laddeep/financeapi/repository/StockFollowingRepository.java
+/Users/nicolasramos/Documents/GitHub/finance-api/src/main/java/com/laddeep/financeapi/service/QuoteService.java
 /Users/nicolasramos/Documents/GitHub/finance-api/src/main/java/com/laddeep/financeapi/service/TelegramMessageService.java
 /Users/nicolasramos/Documents/GitHub/finance-api/src/main/java/com/laddeep/financeapi/repository/StockEmaRepository.java
 /Users/nicolasramos/Documents/GitHub/finance-api/src/main/java/com/laddeep/financeapi/integrations/finnhub/api/StockPriceQuote.java
@@ -35,6 +36,7 @@
 /Users/nicolasramos/Documents/GitHub/finance-api/src/main/java/com/laddeep/financeapi/entity/db/StockPrice.java
 /Users/nicolasramos/Documents/GitHub/finance-api/src/main/java/com/laddeep/financeapi/entity/db/StockSma.java
 /Users/nicolasramos/Documents/GitHub/finance-api/src/main/java/com/laddeep/financeapi/integrations/finnhub/api/Earning.java
+/Users/nicolasramos/Documents/GitHub/finance-api/src/main/java/com/laddeep/financeapi/config/CacheConfig.java
 /Users/nicolasramos/Documents/GitHub/finance-api/src/main/java/com/laddeep/financeapi/component/StockBean.java
 /Users/nicolasramos/Documents/GitHub/finance-api/src/main/java/com/laddeep/financeapi/controller/api/HelloWorldController.java
 /Users/nicolasramos/Documents/GitHub/finance-api/src/main/java/com/laddeep/financeapi/exceptions/BadRequestException.java
