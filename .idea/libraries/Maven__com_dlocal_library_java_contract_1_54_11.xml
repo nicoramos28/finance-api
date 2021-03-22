@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: com.dlocal.library:java-contract:1.54.11">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/com/dlocal/library/java-contract/1.54.11/java-contract-1.54.11.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/com/dlocal/library/java-contract/1.54.11/java-contract-1.54.11-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/com/dlocal/library/java-contract/1.54.11/java-contract-1.54.11-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
