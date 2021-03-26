@@ -9,6 +9,7 @@ import com.laddeep.financeapi.mapper.StockPriceDTOMapper;
 import com.laddeep.financeapi.integrations.finnhub.FinnhubClient;
 import com.laddeep.financeapi.integrations.finnhub.api.StockPriceQuote;
 import com.laddeep.financeapi.util.DateUtil;
+import com.laddeep.financeapi.util.constants.LowestIVQuotes;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -36,12 +37,15 @@ public class StockService{
 
     private Boolean hasResult;
 
+    private LowestIVQuotes lowestIV;
+
     public StockService(
             StockPriceDTOMapper quoteDtoMapper,
             FinnhubClient finnhubClient,
             StockBean stockBean,
             TelegramMessageService messageService,
-            DateUtil dateUtil
+            DateUtil dateUtil,
+            LowestIVQuotes lowestIV
     ) {
         this.stockPriceMapper = quoteDtoMapper;
         this.finnhubClient = finnhubClient;
@@ -49,6 +53,7 @@ public class StockService{
         this.messageService = messageService;
         this.dateUtil = dateUtil;
         this.hasResult = false;
+        this.lowestIV = lowestIV;
     }
 
     public StockPriceDTO getStockPrice(Quote quote){
@@ -151,10 +156,19 @@ public class StockService{
     }
 
 
-    public void getQuotesInTwoCandlesStrategy(){
-        log.info("Getting list of all quotes in DB and all quotes that fulfill the strategy of two candles");
-        List<Quote> quotes = stockBean.getAllQuotes();
-        List<String> performTwoCandles = new ArrayList<>();
+    public void getQuotesInTwoCandlesStrategy(Boolean fromDatabase){
+        List<Quote> quotes;
+        List<String> performTwoCandles;
+
+        if(fromDatabase){
+            log.info("Getting list of all quotes in DB and all quotes that fulfill the strategy of two candles");
+            quotes = stockBean.getAllQuotes();
+            performTwoCandles = new ArrayList<>();
+        }else{
+            log.info("Getting list of all quotes in file and all quotes that fulfill the strategy of two candles");
+            quotes = lowestIV.getLowestIVQuotes();
+            performTwoCandles = new ArrayList<>();
+        }
 
         quotes.forEach(quote->{
             /* Get quote prices */
