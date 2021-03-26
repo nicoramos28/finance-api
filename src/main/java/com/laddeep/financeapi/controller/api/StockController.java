@@ -57,13 +57,14 @@ public class StockController {
         return stockService.saveStockToFollow(ticker);
     }
 
-    @RequestMapping(value = "/two_candles", method = RequestMethod.POST)
-    public void runTwoCandlesStrategyQuotes(){
-        Thread twoCandlesAnalyticsThread = new Thread(()->{
-            stockService.getQuotesInTwoCandlesStrategy();
-        });
-        twoCandlesAnalyticsThread.start();
+    @RequestMapping(value = "/two_candles/{fromDB}", method = RequestMethod.POST)
+    public void runTwoCandlesStrategyQuotes(
+        @PathVariable Boolean fromDB
+        ){
+            Thread twoCandlesAnalyticsThread = new Thread(()->{
+                stockService.getQuotesInTwoCandlesStrategy(fromDB);
+            });
+            twoCandlesAnalyticsThread.start();
     }
-
 
 }
